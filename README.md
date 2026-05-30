@@ -1,24 +1,29 @@
-# Open Saber VR
-This is a fork of [Beep Saber by NeoSpark314](https://github.com/NeoSpark314/BeepSaber) ported to Godot 4.3 and OpenXR (WIP)
+# Open Slice
+This is a fork of [Open Saber by LeandroDreamer](https://github.com/leandrodreamer/BeepSaber) which is a fork of [Beep Saber by NeoSpark314](https://github.com/NeoSpark314/BeepSaber) ported to Godot 4.7, with more modchart support.
+
 (The OQ Toolkit is only partially ported/patched for it to work on Godot 4 with OpenXR, most features that are not used in this project will not work)
 
-This fork tries to improve the experience and make it more of it's own game instead of just a demo.
 
+This fork tries to improve the experience, graphics and aims to make it more of it's own game instead of just a demo.
 
+This project should support all OpenXR supported devices
 
-This is a basic implementation of the beat saber game mechanic for VR using the [Godot Game Engine](https://godotengine.org/) and the [Godot Oculus Quest Toolkit](https://github.com/NeoSpark314/godot_oculus_quest_toolkit). The main objective of this project is to show how a VR game can be implemented using
-the Godot game engine.
+### This fork uses a simplified scoring system:
 
-The main target platform is the Oculus Quest but it should also work with SteamVR if you add the OpenVR plugin to the addons folder in the godot project.
+5 points for **accuracy**,
 
-Originally this game was (and still is) a demo game as part of the Godot Oculus Quest Toolkit. To keep the demo implementation small
-this stand alone version was forked so that it can be changed and developed independent of the original demo.
+and another 5 points for **controller movement** since the last note(**subject to change**).
 
-![screenshot01](doc/images/OS0.4.0_1.gif)
-![screenshot02](doc/images/OS0.4.0_2.gif)
-![screenshot03](doc/images/OS0.4.0_3.gif)
+This system was chosen to make 100%ing a map realistic
+
+(gif showing off the map [Centipede by NiceToMeetYou](https://beatsaver.com/maps/4e8d))
+![Centipede](doc/images/Centipede.gif)
+(gif showing off the map [Boy's a liar Pt. 2 by August](https://beatsaver.com/maps/30a1f))
+![Poodels](doc/images/Poodles.gif)
+
 # About the implementation
-This game uses godot 4.3. The implementation supports to load and play maps from [BeatSaver](https://beatsaver.com/).
+This game uses godot 4.7. The implementation supports to load and play maps from [BeatSaver](https://beatsaver.com/).
+Mapping Extentions and chroma support are available thanks to VSjnk, and noodle extentions support is currently being worked on
 To export for android headsets the godot openxr vendors plugin may be needed
 
 There is one demo song included that is part of the deployed package.
@@ -29,4 +34,4 @@ You can play custom songs by downloading them in the in-game menu.
 The included Music Track is Time Lapse by TheFatRat (https://www.youtube.com/watch?v=3fxq7kqyWO8)
 
 # Licensing
-The source code of the godot beep saber / open saber game in this repository is licensed under an MIT License.
+This repository is licensed under the MIT license
