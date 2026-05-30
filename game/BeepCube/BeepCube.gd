@@ -91,8 +91,8 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color) -> void
 	big_coll_area.set_collision_layer_value(CollisionLayerConstants.RightNote_bit, not is_left_note)
 	var small_coll_area := $BeepCube_Small as Area3D
 	small_coll_area.collision_layer = 0x0
-	small_coll_area.set_collision_layer_value(CollisionLayerConstants.LeftNote_bit, not is_left_note)
-	small_coll_area.set_collision_layer_value(CollisionLayerConstants.RightNote_bit, is_left_note)
+	small_coll_area.set_collision_layer_value(CollisionLayerConstants.LeftNote_bit, true)
+	small_coll_area.set_collision_layer_value(CollisionLayerConstants.RightNote_bit, true)
 	
 	# play the spawn animation when this cube enters the scene
 	var anim := $AnimationPlayer as AnimationPlayer
@@ -138,7 +138,7 @@ func cut(saber_type: int, cut_speed: Vector3, cut_plane: Plane, controller: Beep
 	var cut_distance := cut_plane.distance_to(global_transform.origin)
 	
 	if saber_type == which_saber:
-		if base_cut_angle_accuracy < 0.5 && !is_dot:
+		if base_cut_angle_accuracy < 0.75 && !is_dot:
 			print(collision_small.get_parent(), " ", area)
 			if area == collision_small.get_parent():
 				Scoreboard.bad_cut(transform.origin)

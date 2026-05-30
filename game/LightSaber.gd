@@ -11,7 +11,7 @@ class_name LightSaber
 # store the saber material in a variable so the main game can set the color on initialize
 @onready var _anim := $AnimationPlayer as AnimationPlayer
 @onready var _ray_cast := $RayCast3D as RayCast3D
-@onready var _swing_cast := $SwingableRayCast as SwingableRayCast
+@export var _swing_cast :Area3D
 @onready var saber_visual := $saber_holder.get_child(0) as DefaultSaber
 @onready var controller := get_parent() as BeepSaberController
 
@@ -82,10 +82,10 @@ func _ready() -> void:
 	Settings.changed.connect(on_settings_changed)
 	
 	if type == 0:
-		_swing_cast._set_collision_mask_value(CollisionLayerConstants.LeftNote_bit, true)
+		_swing_cast.set_collision_mask_value(CollisionLayerConstants.LeftNote_bit, true)
 	else:
-		_swing_cast._set_collision_mask_value(CollisionLayerConstants.RightNote_bit, true)
-	_swing_cast._set_collision_mask_value(CollisionLayerConstants.Bombs_bit, true)
+		_swing_cast.set_collision_mask_value(CollisionLayerConstants.RightNote_bit, true)
+	_swing_cast.set_collision_mask_value(CollisionLayerConstants.Bombs_bit, true)
 
 func _physics_process(delta: float) -> void:
 	position = offset_pos + extra_offset_pos
@@ -114,9 +114,6 @@ func set_saber(saber_path: String) -> void:
 		saber_visual.set_thickness(Settings.thickness)
 		saber_visual.set_trail(Settings.saber_tail)
 
-func set_swingcast_enabled(value: bool) -> void:
-	_swing_cast.set_raycasts_enabled(value)
-
 func _handle_area_collided(area: Area3D) -> void:
 	if Scoreboard.paused: return
 	var cut_object := area.get_parent()
@@ -135,9 +132,3 @@ func _handle_area_collided(area: Area3D) -> void:
 	const BEAT_DISTANCE := 4.0
 	var cutplane := Plane(o, saber_end, saber_end_past + Vector3(0, 0, BEAT_DISTANCE * Map.current_info.beats_per_minute * last_dt / 30)) # Account for relative position to track speed
 	note.cut(type, controller_speed, cutplane, controller,area)
-
-func _on_AnimationPlayer_animation_started(_anim_name: StringName) -> void:
-	_swing_cast.adjust_segments = true
-
-func _on_AnimationPlayer_animation_finished(_anim_name: StringName) -> void:
-	_swing_cast.adjust_segments = false

@@ -19,8 +19,6 @@ func _ready(game: BeepSaber_Game) -> void:
 	game.right_ui_raycast.visible = false
 	game.highscore_keyboard._hide()
 	game.online_search_keyboard._hide()
-	game.left_saber.set_swingcast_enabled(true)
-	game.right_saber.set_swingcast_enabled(true)
 	Scoreboard.paused = false
 
 func _physics_process(game: BeepSaber_Game) -> void:
