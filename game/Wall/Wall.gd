@@ -18,7 +18,9 @@ func _physics_process(delta: float) -> void :
 	transform.origin.z += speed * delta
 	
 	# remove children that go to far
-	if transform.origin.z > despawn_z:
+	var mesh: = $WallMeshOrientation / WallMesh as MeshInstance3D
+	var m: = mesh.mesh as BoxMesh
+	if transform.origin.z - m.size.z/2 > despawn_z:
 		queue_free()
 
 func spawn(wall_info: ObstacleInfo, current_beat: float, color: Color) -> void :
@@ -29,8 +31,6 @@ func spawn(wall_info: ObstacleInfo, current_beat: float, color: Color) -> void :
 	var shape: = ($WallMeshOrientation / WallArea / CollisionShape3D as CollisionShape3D).shape as BoxShape3D
 	if wall_info.line_layer == 0:
 		testforLayer += 1
-
-
 
 	wallWidth = wall_info.width
 	var wallHeight = wall_info.height
@@ -112,7 +112,7 @@ func spawn(wall_info: ObstacleInfo, current_beat: float, color: Color) -> void :
 	speed = Constants.BEAT_DISTANCE * Map.current_info.beats_per_minute / 60.0
 	($AnimationPlayer as AnimationPlayer).play(&"Spawn")
 
-func PostfixWallHeight(wallType, wallHeight):
+func PostfixWallHeight(wallType, wallHeight) -> float:
 	if wallType < 1000 or wallType > 4005000:
 		return wallHeight
 	
@@ -123,7 +123,7 @@ func PostfixWallHeight(wallType, wallHeight):
 		wallHeight -= 1000
 	return wallHeight / 1000.0 * 5 * 1000 + 1000
 
-func PostfixstartHeight(wallType, startHeight):
+func PostfixstartHeight(wallType, startHeight) -> float:
 	if wallType < 1000 or wallType > 4005000:
 		return startHeight
 	if wallType >= 4001 and wallType <= 4005000:
@@ -131,7 +131,7 @@ func PostfixstartHeight(wallType, startHeight):
 		startHeight = fmod(wallType - 4001, 1000)
 	return startHeight / 750.0 * 5 * 1000 + 1334
 
-func PrefixWallHeight(wallType, wallHeight, line_layer, height):
+func PrefixWallHeight(wallType, wallHeight, line_layer, height) -> float:
 	if !Constants.usingMappingExtension:
 		return wallHeight
 	#get spawn data
@@ -145,7 +145,7 @@ func PrefixWallHeight(wallType, wallHeight, line_layer, height):
 	return wallHeight * line_layer
 	#FIND OUT WHAT StaticBeatmapObjectSpawnMovementData IS!!
 
-func PostfixWallType(wallType, wallHeight, startHeight):
+func PostfixWallType(wallType, wallHeight, startHeight)  -> float:
 	if wallType >= 4001:
 		wallType = wallHeight / 1000.0 - startHeight - 4001
 		return wallType * sign(wallType)

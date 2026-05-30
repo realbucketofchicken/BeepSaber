@@ -127,6 +127,8 @@ shape = SubResource("CylinderShape3D_38d8l")
 
 [node name="Area3D" type="Area3D" parent="." unique_id=2125199768]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+collision_layer = 0
+collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" unique_id=2072239756]
 shape = SubResource("BoxShape3D_74i8j")

@@ -22,6 +22,10 @@ var _mat: ShaderMaterial
 var piece_left : CutPiece = null
 var piece_right : CutPiece = null
 
+var tracks:Array[StringName]
+var is_fake:bool
+var interactible:bool
+
 func _ready() -> void:
 	_mat = mi.material_override as ShaderMaterial
 	_mesh = mi.mesh
@@ -38,7 +42,6 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color) -> void
 	# re-enable our process_mode first otherwise it seems like Godot-internals
 	# can behave weirdly (ex. AnimationPlayer won't always play correctly)
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	
 	speed = Constants.BEAT_DISTANCE * Map.current_info.beats_per_minute * 0.016666666666666667
 	beat = note_info.beat
 	which_saber = note_info.color
@@ -51,13 +54,13 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color) -> void
 	
 	if noteLineIndex >= 1000 or noteLineIndex <= -1000:
 		if sign(note_info.line_index) == 1:
-			transform.origin.x = (note_info.line_index / 1000.0) - 2.5
+			transform.origin.x = ((note_info.line_index / 1000.0) - 2.5)
 		else:
-			transform.origin.x = (note_info.line_index / 1000.0) - 0.5
-		transform.origin.y = (noteLayerIndex - 1000.0) / 1000.0 + 0.8
+			transform.origin.x = ((note_info.line_index / 1000.0) - 0.5)
+		transform.origin.y = ((noteLayerIndex - 1000.0) / 1000.0 + 0.8)
 	else:
 		transform.origin.x = (note_info.line_index * 0.6) + Constants.LANE_ZERO_X
-		transform.origin.y = (note_info.line_layer * 0.6) + Constants.LAYER_ZERO_Y
+		transform.origin.y = (note_info.line_layer * 0.6 ) + Constants.LAYER_ZERO_Y
 
 	transform.origin.z = - (note_info.beat - current_beat) * Constants.BEAT_DISTANCE
 	if note_info.cut_direction < 9:
@@ -69,6 +72,23 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color) -> void
 		(collision_big.shape as BoxShape3D).size.y = 0.8
 	else:
 		(collision_big.shape as BoxShape3D).size.y = 0.5
+	
+	if note_info.custom_data.has("_position"):
+		var pos:Array = note_info.custom_data["_position"]
+		transform.origin = Vector3(pos[0]* 0.6,(pos[1]* 0.6) + Constants.LAYER_ZERO_Y,transform.origin.z)
+	if note_info.custom_data.has("_scale"):
+		var scales:Array = note_info.custom_data["_scale"]
+		scale = Vector3(scales[0],scales[1],scales[2])
+	if note_info.custom_data.has("_cutDirection"):
+		rotation_degrees.z = note_info.custom_data["_cutDirection"]
+	if note_info.custom_data.has("_track"):
+		var found_tracks:Array
+		for track in found_tracks:
+			tracks.append(StringName(track))
+	if note_info.custom_data.has("_fake"):
+		is_fake = note_info.custom_data["_fake"]
+	if note_info.custom_data.has("_interactable"):
+		interactible = note_info.custom_data["_interactable"]
 	
 	piece_left.set_color(color)
 	piece_right.set_color(color)
@@ -128,10 +148,13 @@ func on_miss() -> void:
 	release()
 
 func set_collision_disabled(value: bool) -> void:
+	await get_tree().physics_frame
 	collision_big.disabled = value
 	collision_small.disabled = value
 
 func cut(saber_type: int, cut_speed: Vector3, cut_plane: Plane, controller: BeepSaberController,area:Area3D) -> void:
+	if !interactible:
+		return
 	# compute the angle between the cube orientation and the cut direction
 	var cut_direction_xy := -Vector3(cut_speed.x, cut_speed.y, 0.0).normalized()
 	var base_cut_angle_accuracy := global_transform.basis.y.dot(cut_direction_xy)
@@ -141,7 +164,8 @@ func cut(saber_type: int, cut_speed: Vector3, cut_plane: Plane, controller: Beep
 		if base_cut_angle_accuracy < 0.75 && !is_dot:
 			print(collision_small.get_parent(), " ", area)
 			if area == collision_small.get_parent():
-				Scoreboard.bad_cut(transform.origin)
+				if !is_fake:
+					Scoreboard.bad_cut(transform.origin)
 				cutted.emit(false)
 			else:
 				return
@@ -150,10 +174,12 @@ func cut(saber_type: int, cut_speed: Vector3, cut_plane: Plane, controller: Beep
 			var travel_distance_factor := controller.movement_aabb.position.distance_to(controller.movement_aabb.end)
 			travel_distance_factor = clampf((travel_distance_factor-0.04)/0.1, 0.0, 1.0)
 			# allows a bit of save margin where the beat is considered 100% correct
-			Scoreboard.note_cut(transform.origin, cut_distance_accuracy, travel_distance_factor)
+			if !is_fake:
+				Scoreboard.note_cut(transform.origin, cut_distance_accuracy, travel_distance_factor)
 			cutted.emit(true)
 	else:
-		Scoreboard.bad_cut(transform.origin)
+		if !is_fake:
+			Scoreboard.bad_cut(transform.origin)
 		cutted.emit(false)
 	
 	# reset the movement tracking volume for the next cut

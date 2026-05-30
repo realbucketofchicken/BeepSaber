@@ -83,7 +83,7 @@ font_size = 6
 vertical_alignment = 0
 depth = 0.0
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_gopif"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sm0lh"]
 resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("14_155do")
@@ -195,7 +195,7 @@ skeleton = NodePath("")
 
 [node name="Percent_Indicator" parent="." unique_id=759676450 instance=ExtResource("16")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1, -2.5)
-material_override = SubResource("ShaderMaterial_gopif")
+material_override = SubResource("ShaderMaterial_sm0lh")
 mesh = SubResource("QuadMesh_02xdc")
 
 [node name="EndScore" parent="." unique_id=1143902141 instance=ExtResource("20_fgfws")]

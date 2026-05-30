@@ -3,7 +3,9 @@ render_mode cull_disabled,diffuse_burley,specular_schlick_ggx;
 
 uniform vec4 color : source_color;
 uniform sampler2D texture_emission : hint_default_black;
+uniform sampler2D dissolve_texture;
 
+uniform float dissolve;
 uniform float metallic;
 uniform float roughness;
 uniform float sub_emission_energy;
@@ -54,7 +56,7 @@ void fragment() {
 	ALBEDO = color.rgb;
 	METALLIC = metallic;
 	ROUGHNESS = roughness;
-	if (FRONT_FACING) {
+	if (FRONT_FACING || (dissolve > 0.0)) {
 		vec2 dot_uv = vec2(UV.x+0.5, UV.y);
 		EMISSION = (color.rgb * sub_emission_energy) + texture(texture_emission, is_dot ? dot_uv : UV).rgb;
 		
@@ -70,5 +72,10 @@ void fragment() {
 		}
 	} else {
 		EMISSION = vec3(1.0);
+	}
+	if (dissolve > 0.0){
+		if (texture(dissolve_texture,UV).r<dissolve){
+			discard;
+		}
 	}
 }
