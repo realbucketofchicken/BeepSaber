@@ -7,15 +7,17 @@ var line_layer: int
 var color: int # 0=left, 1=right
 var cut_direction: int
 var angle_offset: int
+var custom_data:Dictionary
 
 @warning_ignore("shadowed_variable")
-func _init(beat: float, line_index: int, line_layer: int, color: int, cut_direction: int, angle_offset: int) -> void:
+func _init(beat: float, line_index: int, line_layer: int, color: int, cut_direction: int, angle_offset: int, custom_data: Dictionary) -> void:
 	self.beat = beat
 	self.line_index = line_index
 	self.line_layer = line_layer
 	self.color = color
 	self.cut_direction = cut_direction
 	self.angle_offset = angle_offset
+	self.custom_data = custom_data
 
 static func new_v2(note_dict: Dictionary) -> ColorNoteInfo:
 	return ColorNoteInfo.new(
@@ -24,7 +26,8 @@ static func new_v2(note_dict: Dictionary) -> ColorNoteInfo:
 		int(Utils.get_float(note_dict, "_lineLayer", 0)),
 		int(Utils.get_float(note_dict, "_type", -1.0)),
 		int(Utils.get_float(note_dict, "_cutDirection", 0)),
-		0
+		0,
+		Utils.get_dict(note_dict, "_customData", {})
 	)
 
 static func new_v3(note_dict: Dictionary) -> ColorNoteInfo:
@@ -34,5 +37,6 @@ static func new_v3(note_dict: Dictionary) -> ColorNoteInfo:
 		int(Utils.get_float(note_dict, "y", 0)),
 		int(Utils.get_float(note_dict, "c", -1)),
 		int(Utils.get_float(note_dict, "d", 0)),
-		int(Utils.get_float(note_dict, "a", 0))
+		int(Utils.get_float(note_dict, "a", 0)),
+		Utils.get_dict(note_dict, "_customData", {})
 	)

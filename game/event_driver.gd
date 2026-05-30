@@ -8,28 +8,30 @@ var rings_in := false
 var left_color: Color
 var right_color: Color
 
-@onready var ring_holder := $Level/rings as Node3D
-@onready var diagonal_lasers_holder := $Level/DiagonalLasers as Node3D
-@onready var square_lasers_holder := $Level/SquareLasers as Node3D
-@onready var left_waving_lasers_holder := $Level/LeftWavingLasers as Node3D
-@onready var right_waving_lasers_holder := $Level/RightWavingLasers as Node3D
-@onready var track_lights_holder := $Level/TrackLights as Node3D
+@onready var ring_holder: = $Level / rings as Node3D
+@onready var diagonal_lasers_holder: = $Level / DiagonalLasers as Node3D
+@onready var square_lasers_holder: = $Level / SquareLasers as Node3D
+@onready var left_waving_lasers_holder: = $Level / LeftWavingLasers as Node3D
+@onready var right_waving_lasers_holder: = $Level / RightWavingLasers as Node3D
+@onready var track_lights_holder: = $Level / TrackLights as Node3D
 
-@onready var sphere_material := ($Level/Sphere as MeshInstance3D).material_override as ShaderMaterial
-@onready var diagonal_lasers_material := ($Level/DiagonalLasers/laser1/Bar7 as MeshInstance3D).material_override as StandardMaterial3D
-@onready var square_lasers_material := ($Level/SquareLasers/Bar7 as MeshInstance3D).material_override as StandardMaterial3D
-@onready var left_waving_lasers_material := ($Level/LeftWavingLasers/laser1/Bar7 as MeshInstance3D).material_override as StandardMaterial3D
-@onready var right_waving_lasers_material := ($Level/RightWavingLasers/laser1/Bar7 as MeshInstance3D).material_override as StandardMaterial3D
-@onready var track_lights_material := ($Level/TrackLights/Bar1 as MeshInstance3D).material_override as StandardMaterial3D
-@onready var floor_material := ($Level/floor as MeshInstance3D).material_override as StandardMaterial3D
+@onready var sphere_material: = ($Level / Sphere as MeshInstance3D).material_override as ShaderMaterial
+@onready var diagonal_lasers_material: = ($Level / DiagonalLasers / laser1 / Bar7 as MeshInstance3D).material_override as StandardMaterial3D
+@onready var square_lasers_material: = ($Level / SquareLasers / Bar7 as MeshInstance3D).material_override as StandardMaterial3D
+@onready var left_waving_lasers_material: = ($Level / LeftWavingLasers / laser1 / Bar7 as MeshInstance3D).material_override as StandardMaterial3D
+@onready var right_waving_lasers_material: = ($Level / RightWavingLasers / laser1 / Bar7 as MeshInstance3D).material_override as StandardMaterial3D
+@onready var track_lights_material: = ($Level / TrackLights / Bar1 as MeshInstance3D).material_override as StandardMaterial3D
+@onready var floor_material: = ($Level / floor as MeshInstance3D).material_override as StandardMaterial3D
 
-@onready var ring_anim_player := $Level/rings/AnimationPlayer as AnimationPlayer
-@onready var left_laser_anim_player := $Level/LeftWavingLasers/AnimationPlayer as AnimationPlayer
-@onready var right_laser_anim_player := $Level/RightWavingLasers/AnimationPlayer as AnimationPlayer
+@onready var ring_anim_player: = $Level / rings / AnimationPlayer as AnimationPlayer
+@onready var left_laser_anim_player: = $Level / LeftWavingLasers / AnimationPlayer as AnimationPlayer
+@onready var right_laser_anim_player: = $Level / RightWavingLasers / AnimationPlayer as AnimationPlayer
 
-@export var disabled := false
+@export var disabled: = false
 
-func _ready() -> void:
+func _ready() -> void :
+
+	Thread.PRIORITY_LOW
 	# get_rendering_device() returns null in opengl, meaning this block is skipped in vulkan
 	if not RenderingServer.get_rendering_device():
 		sphere_material.set_shader_parameter("contrast", 1)
@@ -70,15 +72,18 @@ func set_all_off() -> void:
 		for i in range(5):
 			turn_light_off(i)
 
-func set_all_on(left: Color, right: Color) -> void:
-	if !disabled:
-		update_left_color(left)
-		update_right_color(right)
-		ring_holder.visible = true
+func set_all_on(left: Color, right: Color) -> void :
+	update_left_color(left)
+	update_right_color(right)
+	ring_holder.visible = true
 
 func process_event(data: EventInfo) -> void:
 	if disabled: return
-	if data.type in range(0,5):
+	if data.custom_data.has("_color"):
+		left_color = Color(data.custom_data["_color"][0], data.custom_data["_color"][1], data.custom_data["_color"][2])
+		right_color = Color(data.custom_data["_color"][0], data.custom_data["_color"][1], data.custom_data["_color"][2])
+	
+	if data.type in range(0, 5):
 		match data.value:
 			EventInfo.VALUE_LIGHTS_OFF:
 				turn_light_off(data.type)

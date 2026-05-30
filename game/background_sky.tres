@@ -1,10 +1,11 @@
-[gd_resource type="Sky" load_steps=3 format=3 uid="uid://byunh6ley5hib"]
+[gd_resource type="Sky" format=3 uid="uid://byunh6ley5hib"]
 
-[ext_resource type="Texture2D" uid="uid://dyrjirngmo2mx" path="res://game/data/background/bg_base.png" id="1_vghqg"]
-
-[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_3hu3m"]
-panorama = ExtResource("1_vghqg")
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_h20bd"]
+sky_top_color = Color(0.48845255, 0.49123865, 0.716689, 1)
+sky_horizon_color = Color(0.367445, 0.3042105, 0.3048208, 1)
+ground_bottom_color = Color(0.07481819, 0.08056963, 0.096711, 1)
+ground_horizon_color = Color(0.47079384, 0.4164677, 0.49644238, 1)
 
 [resource]
-sky_material = SubResource("PanoramaSkyMaterial_3hu3m")
+sky_material = SubResource("ProceduralSkyMaterial_h20bd")
 radiance_size = 1

@@ -43,12 +43,10 @@ func add_points(position: Vector3, amount: int) -> void:
 func chain_link_cut(position: Vector3) -> void:
 	add_points(position, 20)
 
-func note_cut(position: Vector3, beat_accuracy: float, cut_angle_accuracy: float, cut_distance_accuracy: float, travel_distance_factor: float) -> void:# point computation based on the accuracy of the swing
+func note_cut(position: Vector3, cut_distance_accuracy: float, travel_distance_factor: float) -> void:# point computation based on the accuracy of the swing
 	var points_new := 0.0
-	points_new += beat_accuracy * 50.0
-	points_new += cut_angle_accuracy * 50.0
-	points_new += cut_distance_accuracy * 50.0
-	points_new += points_new * travel_distance_factor
+	points_new += cut_distance_accuracy * 5.0
+	points_new += travel_distance_factor * 5.0
 	
 	points_new = roundf(points_new)
 	add_points(position, int(points_new))

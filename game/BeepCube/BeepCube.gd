@@ -5,10 +5,10 @@ class_name BeepCube
 # emitted when the cube gets cutted, correct_saber is true if the right saber was used
 signal cutted(correct_saber: bool)
 
-@onready var mi := $BeepCubeMesh as MeshInstance3D
-@onready var collision_big := $BeepCube_Big/CollisionBig as CollisionShape3D
-@onready var collision_small := $BeepCube_Small/CollisionSmall as CollisionShape3D
-@onready var slice_particles := $SliceParticles as BeepCubeSliceParticles
+@export var mi:MeshInstance3D
+@export var collision_big :CollisionShape3D
+@export var collision_small :CollisionShape3D
+@export var slice_particles :BeepCubeSliceParticles
 
 var which_saber: int
 var is_dot: bool
@@ -34,27 +34,41 @@ func _ready() -> void:
 	# slice_particles are within cube's tree, but want then to move in global space
 	slice_particles.top_level = true
 	
-func spawn(note_info: ColorNoteInfo, current_beat: float) -> void:
+func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color) -> void:
 	# re-enable our process_mode first otherwise it seems like Godot-internals
 	# can behave weirdly (ex. AnimationPlayer won't always play correctly)
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	
-	var color := Map.color_left if note_info.color == 0 else Map.color_right
 	speed = Constants.BEAT_DISTANCE * Map.current_info.beats_per_minute * 0.016666666666666667
 	beat = note_info.beat
 	which_saber = note_info.color
 	is_dot = note_info.cut_direction == 8
+	var noteLineIndex = note_info.line_index
+	var noteLayerIndex = note_info.line_layer
+	var leftSide = false
+	var flipLineIndex = noteLineIndex * -1
+	var newLaneCount = 1000
+	
+	if noteLineIndex >= 1000 or noteLineIndex <= -1000:
+		if sign(note_info.line_index) == 1:
+			transform.origin.x = (note_info.line_index / 1000.0) - 2.5
+		else:
+			transform.origin.x = (note_info.line_index / 1000.0) - 0.5
+		transform.origin.y = (noteLayerIndex - 1000.0) / 1000.0 + 0.8
+	else:
+		transform.origin.x = (note_info.line_index * 0.6) + Constants.LANE_ZERO_X
+		transform.origin.y = (note_info.line_layer * 0.6) + Constants.LAYER_ZERO_Y
+
+	transform.origin.z = - (note_info.beat - current_beat) * Constants.BEAT_DISTANCE
+	if note_info.cut_direction < 9:
+		rotation.z = Constants.CUBE_ROTATIONS[note_info.cut_direction] + deg_to_rad(note_info.angle_offset)
+	else:
+		rotation.z = deg_to_rad((note_info.cut_direction - 1000) * -1)
 	
 	if is_dot:
 		(collision_big.shape as BoxShape3D).size.y = 0.8
 	else:
 		(collision_big.shape as BoxShape3D).size.y = 0.5
-	
-	transform.origin.x = Constants.LANE_DISTANCE * float(note_info.line_index) + Constants.LANE_ZERO_X
-	transform.origin.y = Constants.LANE_DISTANCE * float(note_info.line_layer) + Constants.LAYER_ZERO_Y
-	transform.origin.z = -(note_info.beat - current_beat) * Constants.BEAT_DISTANCE
-	
-	rotation.z = Constants.CUBE_ROTATIONS[note_info.cut_direction] + deg_to_rad(note_info.angle_offset)
 	
 	piece_left.set_color(color)
 	piece_right.set_color(color)
@@ -117,23 +131,27 @@ func set_collision_disabled(value: bool) -> void:
 	collision_big.disabled = value
 	collision_small.disabled = value
 
-func cut(saber_type: int, cut_speed: Vector3, cut_plane: Plane, controller: BeepSaberController) -> void:
+func cut(saber_type: int, cut_speed: Vector3, cut_plane: Plane, controller: BeepSaberController,area:Area3D) -> void:
 	# compute the angle between the cube orientation and the cut direction
 	var cut_direction_xy := -Vector3(cut_speed.x, cut_speed.y, 0.0).normalized()
 	var base_cut_angle_accuracy := global_transform.basis.y.dot(cut_direction_xy)
 	var cut_distance := cut_plane.distance_to(global_transform.origin)
 	
 	if saber_type == which_saber:
-		var cut_angle_accuracy := clampf((base_cut_angle_accuracy-0.7)/0.3, 0.0, 1.0)
-		if is_dot: #ignore angle if is a dot
-			cut_angle_accuracy = 1.0
-		var cut_distance_accuracy := clampf((0.1 - absf(cut_distance))/0.1, 0.0, 1.0)
-		var travel_distance_factor := controller.movement_aabb.get_longest_axis_size()
-		travel_distance_factor = clampf((travel_distance_factor-0.5)/0.5, 0.0, 1.0)
-		# allows a bit of save margin where the beat is considered 100% correct
-		var beat_accuracy := clampf((1.0 - absf(global_transform.origin.z)) / 0.5, 0.0, 1.0)
-		Scoreboard.note_cut(transform.origin, beat_accuracy, cut_angle_accuracy, cut_distance_accuracy, travel_distance_factor)
-		cutted.emit(true)
+		if base_cut_angle_accuracy < 0.5 && !is_dot:
+			print(collision_small.get_parent(), " ", area)
+			if area == collision_small.get_parent():
+				Scoreboard.bad_cut(transform.origin)
+				cutted.emit(false)
+			else:
+				return
+		else:
+			var cut_distance_accuracy := clampf((0.32 - absf(cut_distance))/0.25, 0.0, 1.0)
+			var travel_distance_factor := controller.movement_aabb.position.distance_to(controller.movement_aabb.end)
+			travel_distance_factor = clampf((travel_distance_factor-0.04)/0.1, 0.0, 1.0)
+			# allows a bit of save margin where the beat is considered 100% correct
+			Scoreboard.note_cut(transform.origin, cut_distance_accuracy, travel_distance_factor)
+			cutted.emit(true)
 	else:
 		Scoreboard.bad_cut(transform.origin)
 		cutted.emit(false)

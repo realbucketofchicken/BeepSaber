@@ -1,6 +1,6 @@
-[gd_scene load_steps=10 format=3 uid="uid://cplhsipk6vhem"]
+[gd_scene format=3 uid="uid://cplhsipk6vhem"]
 
-[ext_resource type="Script" path="res://game/BeepCube/BeepCube_SliceParticles.gd" id="1"]
+[ext_resource type="Script" uid="uid://bg47d7gwokl2a" path="res://game/BeepCube/BeepCube_SliceParticles.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://cg6kwny2mi3wq" path="res://game/data/gradient.png" id="2_87b8h"]
 
 [sub_resource type="Gradient" id="Gradient_g4n6q"]
@@ -41,10 +41,11 @@ albedo_texture = ExtResource("2_87b8h")
 material = SubResource("StandardMaterial3D_813t4")
 size = Vector2(0.03, 0.135)
 
-[node name="Node3D" type="Node3D"]
+[node name="Node3D" type="Node3D" unique_id=641742539 node_paths=PackedStringArray("c1")]
 script = ExtResource("1")
+c1 = NodePath("Particles3D")
 
-[node name="Particles3D" type="GPUParticles3D" parent="."]
+[node name="Particles3D" type="GPUParticles3D" parent="." unique_id=1706504096]
 layers = 3
 emitting = false
 amount = 60

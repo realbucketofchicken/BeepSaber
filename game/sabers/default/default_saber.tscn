@@ -1,10 +1,10 @@
-[gd_scene load_steps=15 format=3 uid="uid://bw3rjal5qlu0p"]
+[gd_scene format=3 uid="uid://bw3rjal5qlu0p"]
 
 [ext_resource type="Material" uid="uid://chqutrqmle57g" path="res://game/LightSaber.material" id="1"]
 [ext_resource type="AudioStream" uid="uid://bkuquwclng0k" path="res://game/data/lightsaber.ogg" id="2"]
-[ext_resource type="Script" path="res://game/sabers/default/default_saber.gd" id="3"]
+[ext_resource type="Script" uid="uid://dywqpk1ojow2c" path="res://game/sabers/default/default_saber.gd" id="3"]
 [ext_resource type="Texture2D" uid="uid://drc5tdiltfqnk" path="res://game/BeepCube/BeepCubeEmission.png" id="3_b1nd4"]
-[ext_resource type="AudioStream" uid="uid://db2atyh66c0qv" path="res://game/data/beepcube_cut.ogg" id="4"]
+[ext_resource type="AudioStream" uid="uid://d1m0nnw518aku" path="res://game/data/click_002.ogg" id="5_74i8j"]
 [ext_resource type="PackedScene" uid="uid://buhdimf18mwbo" path="res://game/sabers/default/tail.tscn" id="6_wpbvo"]
 
 [sub_resource type="CapsuleMesh" id="1"]
@@ -284,48 +284,48 @@ tracks/6/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_ox0xw"]
 _data = {
-"Hide": SubResource("4"),
-"QuickHide": SubResource("5"),
-"RESET": SubResource("Animation_ddgay"),
-"Show": SubResource("6")
+&"Hide": SubResource("4"),
+&"QuickHide": SubResource("5"),
+&"RESET": SubResource("Animation_ddgay"),
+&"Show": SubResource("6")
 }
 
-[node name="default_saber" type="Node3D"]
+[node name="default_saber" type="Node3D" unique_id=96770485]
 script = ExtResource("3")
 
-[node name="LightSaber_Mesh" type="MeshInstance3D" parent="."]
+[node name="LightSaber_Mesh" type="MeshInstance3D" parent="." unique_id=380216439]
 transform = Transform3D(1, 0, 0, 0, -1, -1.33118e-07, 0, 1.33118e-07, -1, 0, 0.65, 0)
 layers = 3
 material_override = ExtResource("1")
 mesh = SubResource("1")
 
-[node name="Hilt_Mesh" type="MeshInstance3D" parent="."]
+[node name="Hilt_Mesh" type="MeshInstance3D" parent="." unique_id=792885842]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.03, 0)
 layers = 3
 material_override = SubResource("StandardMaterial3D_vuh23")
 mesh = SubResource("2")
 
-[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="."]
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="." unique_id=1128611305]
 volume_db = -6.0
 bus = &"SFX"
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-"": SubResource("AnimationLibrary_ox0xw")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1047712470]
+libraries/ = SubResource("AnimationLibrary_ox0xw")
 
-[node name="base" type="Marker3D" parent="."]
+[node name="base" type="Marker3D" parent="." unique_id=403192531]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0492174, 0)
 
-[node name="tip" type="Marker3D" parent="."]
+[node name="tip" type="Marker3D" parent="." unique_id=327269782]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2554, 0)
 
-[node name="hitsound" type="AudioStreamPlayer3D" parent="."]
+[node name="hitsound" type="AudioStreamPlayer3D" parent="." unique_id=53779539]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.759516, 0)
-stream = ExtResource("4")
+stream = ExtResource("5_74i8j")
 attenuation_model = 3
+volume_db = 5.0
+max_db = 6.0
 bus = &"SFX"
 
-[node name="tail" parent="." instance=ExtResource("6_wpbvo")]
+[node name="tail" parent="." unique_id=1045289502 instance=ExtResource("6_wpbvo")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0492174, 0)
 size = 1.2

@@ -1,6 +1,6 @@
-[gd_scene load_steps=8 format=3 uid="uid://bxsfwm7o1kryl"]
+[gd_scene format=3 uid="uid://bxsfwm7o1kryl"]
 
-[ext_resource type="Script" path="res://game/scripts/UIRaycast/UIRaycastButton.gd" id="1_xb2lf"]
+[ext_resource type="Script" uid="uid://d4kox5jxkd067" path="res://game/scripts/UIRaycast/UIRaycastButton.gd" id="1_xb2lf"]
 [ext_resource type="Material" uid="uid://dqox51k4cngtf" path="res://game/Text.material" id="2_3kli4"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_5e240"]
@@ -10,6 +10,8 @@ size = Vector3(0.25, 0.0625, 0.01)
 [sub_resource type="Shader" id="Shader_kudun"]
 code = "shader_type spatial;
 render_mode unshaded, cull_back;
+uniform vec3 bg_color : source_color = vec3(0.129, 0.133, 0.173);
+uniform vec3 highlight_color : source_color = vec3(0.435, 0.329, 0.204);
 uniform vec2 size = vec2(1.0);
 uniform float highlight = 0.0;
 
@@ -21,7 +23,7 @@ void fragment() {
 	if (UV.x < left_border || UV.x > right_border || UV.y < top_border || UV.y > bottom_border) {
 		ALBEDO = vec3(1.0);
 	} else {
-		ALBEDO = vec3(0.015625 * highlight);
+		ALBEDO = vec3(mix(bg_color,highlight_color,highlight));
 	}
 }
 "
@@ -30,6 +32,8 @@ void fragment() {
 resource_local_to_scene = true
 render_priority = 0
 shader = SubResource("Shader_kudun")
+shader_parameter/bg_color = Color(0.129, 0.133, 0.173, 1)
+shader_parameter/highlight_color = Color(0.435, 0.329, 0.204, 1)
 shader_parameter/size = Vector2(0.5, 0.125)
 shader_parameter/highlight = 0.0
 
@@ -43,19 +47,19 @@ text = "Button"
 font_size = 4
 depth = 0.0
 
-[node name="RaycastButton" type="Area3D"]
+[node name="RaycastButton" type="Area3D" unique_id=1282721132]
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("1_xb2lf")
 
-[node name="Collision" type="CollisionShape3D" parent="."]
+[node name="Collision" type="CollisionShape3D" parent="." unique_id=968725884]
 shape = SubResource("BoxShape3D_5e240")
 
-[node name="BackPanel" type="MeshInstance3D" parent="."]
+[node name="BackPanel" type="MeshInstance3D" parent="." unique_id=1213427276]
 material_override = SubResource("ShaderMaterial_tyoha")
 mesh = SubResource("QuadMesh_sv6mk")
 
-[node name="Text" type="MeshInstance3D" parent="."]
+[node name="Text" type="MeshInstance3D" parent="." unique_id=926639988]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.025)
 material_override = ExtResource("2_3kli4")
 mesh = SubResource("TextMesh_u68ff")

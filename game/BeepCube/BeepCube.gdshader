@@ -57,7 +57,7 @@ void fragment() {
 	if (FRONT_FACING) {
 		vec2 dot_uv = vec2(UV.x+0.5, UV.y);
 		EMISSION = (color.rgb * sub_emission_energy) + texture(texture_emission, is_dot ? dot_uv : UV).rgb;
-
+		
 		if (is_chain_head) {
 			EMISSION += vec3( smoothstep(cut_white_margin+0.01,cut_white_margin,chain_interp) );
 		}

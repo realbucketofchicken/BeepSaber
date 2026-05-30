@@ -1,8 +1,8 @@
-[gd_scene load_steps=12 format=3 uid="uid://dvj8dorx2l7s0"]
+[gd_scene format=3 uid="uid://dvj8dorx2l7s0"]
 
-[ext_resource type="Script" path="res://game/BeepCube/BeepCube.gd" id="1_7mymb"]
+[ext_resource type="Script" uid="uid://dksq1tvm6xty6" path="res://game/BeepCube/BeepCube.gd" id="1_7mymb"]
 [ext_resource type="PackedScene" uid="uid://bghawm0dmboxm" path="res://game/BeepCube/BeepCubeMesh.glb" id="2_sbb11"]
-[ext_resource type="Shader" path="res://game/BeepCube/BeepCube.gdshader" id="3_7slj3"]
+[ext_resource type="Shader" uid="uid://l67f1nrhxug1" path="res://game/BeepCube/BeepCube.gdshader" id="3_7slj3"]
 [ext_resource type="Texture2D" uid="uid://drc5tdiltfqnk" path="res://game/BeepCube/BeepCubeEmission.png" id="4_10m2m"]
 [ext_resource type="PackedScene" uid="uid://cplhsipk6vhem" path="res://game/BeepCube/BeepCube_SliceParticles.tscn" id="5_tissj"]
 
@@ -26,9 +26,21 @@ tracks/0/keys = {
 "update": 0,
 "values": [Vector3(0.8, 0.8, 0.8)]
 }
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
 
 [sub_resource type="Animation" id="3"]
-length = 0.8
+length = 2.0
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -36,50 +48,51 @@ tracks/0/path = NodePath(".:position")
 tracks/0/interp = 2
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.3, 0.6, 0.8),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
+"times": PackedFloat32Array(0.3, 0.6, 0.8, 1.1, 1.2666667, 1.4666667, 1.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
 "update": 0,
-"values": [Vector3(0, 0, -2), Vector3(0, 0, 0), Vector3(0, 0.5, 0), Vector3(0, 0, 0)]
+"values": [Vector3(0, 0.6, 0), Vector3(0, 0.5, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0.01, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath(".:rotation_degrees")
-tracks/1/interp = 1
+tracks/1/path = NodePath(".:scale")
+tracks/1/interp = 2
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.3, 0.8),
-"transitions": PackedFloat32Array(1, 1, 1),
+"times": PackedFloat32Array(0, 0.3, 0.8, 1.1, 1.34),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 0,
-"values": [Vector3(0, 0, -180), Vector3(0, 0, -180), Vector3(0, 0, 0)]
+"values": [Vector3(0, 0, 0), Vector3(0.1, 0.1, 0.1), Vector3(1, 1, 1), Vector3(1, 1, 1), Vector3(1, 1, 1)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath(".:scale")
-tracks/2/interp = 1
+tracks/2/path = NodePath(".:rotation")
+tracks/2/interp = 2
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.3, 0.8),
+"times": PackedFloat32Array(0, 1.063633, 1.8),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Vector3(0.1, 0.1, 0.1), Vector3(0.1, 0.1, 0.1), Vector3(1, 1, 1)]
+"values": [Vector3(0, 0, 3.1415927), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_7xfev"]
 _data = {
-"RESET": SubResource("Animation_tbh3g"),
-"Spawn": SubResource("3")
+&"RESET": SubResource("Animation_tbh3g"),
+&"Spawn": SubResource("3")
 }
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_gk6d3"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_x86ma"]
 resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("3_7slj3")
-shader_parameter/color = Color(1, 0, 0, 1)
-shader_parameter/metallic = 0.3
-shader_parameter/roughness = 0.2
-shader_parameter/sub_emission_energy = 0.18
+shader_parameter/color = Color(1, 1, 1, 1)
+shader_parameter/texture_emission = ExtResource("4_10m2m")
+shader_parameter/metallic = 0.75
+shader_parameter/roughness = 0.22
+shader_parameter/sub_emission_energy = 0.0
 shader_parameter/cutted = false
 shader_parameter/cut_dist_from_center = 0.0
 shader_parameter/cut_vanish = 0.0
@@ -87,35 +100,40 @@ shader_parameter/cut_angle = 0.0
 shader_parameter/cut_white_margin = 0.04
 shader_parameter/is_dot = false
 shader_parameter/is_chain_head = false
-shader_parameter/texture_emission = ExtResource("4_10m2m")
 
-[node name="BeepCube" type="Node3D"]
+[node name="BeepCube" type="Node3D" unique_id=1480937251 node_paths=PackedStringArray("mi", "collision_big", "collision_small", "slice_particles")]
 script = ExtResource("1_7mymb")
+mi = NodePath("BeepCubeMesh/BeepCubeMesh")
+collision_big = NodePath("BeepCube_Big/CollisionBig")
+collision_small = NodePath("BeepCube_Small/CollisionSmall")
+slice_particles = NodePath("SliceParticles")
 
-[node name="BeepCube_Big" type="Area3D" parent="." groups=["beepcube"]]
+[node name="BeepCube_Big" type="Area3D" parent="." unique_id=1395643966 groups=["beepcube"]]
 monitoring = false
 
-[node name="CollisionBig" type="CollisionShape3D" parent="BeepCube_Big"]
+[node name="CollisionBig" type="CollisionShape3D" parent="BeepCube_Big" unique_id=473421397]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.25)
 shape = SubResource("1")
 disabled = true
 
-[node name="BeepCube_Small" type="Area3D" parent="." groups=["beepcube"]]
+[node name="BeepCube_Small" type="Area3D" parent="." unique_id=1253656530 groups=["beepcube"]]
 monitoring = false
 
-[node name="CollisionSmall" type="CollisionShape3D" parent="BeepCube_Small"]
+[node name="CollisionSmall" type="CollisionShape3D" parent="BeepCube_Small" unique_id=1151495483]
 shape = SubResource("2")
 disabled = true
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1568566500]
 root_node = NodePath("../BeepCubeMesh")
-libraries = {
-"": SubResource("AnimationLibrary_7xfev")
-}
+libraries/ = SubResource("AnimationLibrary_7xfev")
 
-[node name="BeepCubeMesh" parent="." instance=ExtResource("2_sbb11")]
+[node name="BeepCubeMesh" parent="." unique_id=842838808 instance=ExtResource("2_sbb11")]
 transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0, 0)
-layers = 3
-material_override = SubResource("ShaderMaterial_gk6d3")
 
-[node name="SliceParticles" parent="." instance=ExtResource("5_tissj")]
+[node name="BeepCubeMesh" parent="BeepCubeMesh" index="0" unique_id=124202617]
+layers = 3
+material_override = SubResource("ShaderMaterial_x86ma")
+
+[node name="SliceParticles" parent="." unique_id=487635705 instance=ExtResource("5_tissj")]
+
+[editable path="BeepCubeMesh"]

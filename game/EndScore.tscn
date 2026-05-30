@@ -1,22 +1,31 @@
-[gd_scene load_steps=25 format=3 uid="uid://i5nhm2p2kqay"]
+[gd_scene format=3 uid="uid://i5nhm2p2kqay"]
 
-[ext_resource type="Shader" path="res://game/UI_Panel.gdshader" id="1_cfcnp"]
-[ext_resource type="Script" path="res://game/EndScore.gd" id="1_jacne"]
+[ext_resource type="Shader" uid="uid://578j7gqowk01" path="res://game/UI_Panel.gdshader" id="1_cfcnp"]
+[ext_resource type="Script" uid="uid://6kwshbllxwdq" path="res://game/EndScore.gd" id="1_jacne"]
 [ext_resource type="PackedScene" uid="uid://63fr72w7kh2w" path="res://game/PercentIndicator.tscn" id="2_dpn16"]
+[ext_resource type="Shader" uid="uid://on3j404gjcsp" path="res://game/PercentIndicator.gdshader" id="4_h20bd"]
 [ext_resource type="PackedScene" uid="uid://bxsfwm7o1kryl" path="res://game/scripts/UIRaycast/UIRaycastButton.tscn" id="4_n4s7s"]
 [ext_resource type="FontFile" uid="uid://01k27lk2a4bw" path="res://OQ_Toolkit/OQ_UI2D/theme/RobotoMono-Medium.ttf" id="5_v4xkn"]
 [ext_resource type="Material" uid="uid://dqox51k4cngtf" path="res://game/Text.material" id="6_2vw0d"]
-[ext_resource type="Script" path="res://game/scripts/UIRaycast/UIRaycastTarget.gd" id="6_25iqa"]
+[ext_resource type="Script" uid="uid://ddpmscb0b00d0" path="res://game/scripts/UIRaycast/UIRaycastTarget.gd" id="6_25iqa"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_igkn4"]
 render_priority = 0
 shader = ExtResource("1_cfcnp")
 shader_parameter/size = Vector2(1, 0.5)
-shader_parameter/highlight = 0.0
+shader_parameter/bg_color = Color(0.129, 0.133, 0.173, 1)
+shader_parameter/highlight_color = Color(0.364, 0.42, 0.223, 1)
+shader_parameter/highlight = 1.0
 
 [sub_resource type="QuadMesh" id="QuadMesh_le4ok"]
 material = SubResource("ShaderMaterial_igkn4")
 size = Vector2(2, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_h20bd"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("4_h20bd")
+shader_parameter/how_full = 0.0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cwpr4"]
 resource_local_to_scene = true
@@ -85,6 +94,15 @@ fallbacks = Array[Font]([ExtResource("5_v4xkn")])
 subpixel_positioning = 0
 msdf_pixel_range = 14
 msdf_size = 128
+cache/0/variation_coordinates = {}
+cache/0/face_index = 0
+cache/0/embolden = 0.0
+cache/0/transform = Transform2D(1, 0, 0, 1, 0, 0)
+cache/0/spacing_top = 0
+cache/0/spacing_bottom = 0
+cache/0/spacing_space = 0
+cache/0/spacing_glyph = 0
+cache/0/baseline_offset = 0.0
 cache/0/16/0/ascent = 0.0
 cache/0/16/0/descent = 0.0
 cache/0/16/0/underline_position = 0.0
@@ -1346,50 +1364,51 @@ default_font = SubResource("9")
 [sub_resource type="BoxShape3D" id="BoxShape3D_iqqq6"]
 size = Vector3(2, 1, 0.001)
 
-[node name="EndScore" type="MeshInstance3D"]
+[node name="EndScore" type="MeshInstance3D" unique_id=5679505]
 mesh = SubResource("QuadMesh_le4ok")
 script = ExtResource("1_jacne")
 
-[node name="PercentIndicator" parent="." instance=ExtResource("2_dpn16")]
+[node name="PercentIndicator" parent="." unique_id=1571255092 instance=ExtResource("2_dpn16")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.1)
+material_override = SubResource("ShaderMaterial_h20bd")
 
-[node name="Repeat" parent="." instance=ExtResource("4_n4s7s")]
+[node name="Repeat" parent="." unique_id=1490923076 instance=ExtResource("4_n4s7s")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, -0.35, 0.1)
 size = Vector2(0.5, 0.125)
 text = "Repeat"
 
-[node name="MainMenu" parent="." instance=ExtResource("4_n4s7s")]
+[node name="MainMenu" parent="." unique_id=1204467553 instance=ExtResource("4_n4s7s")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, -0.35, 0.1)
 size = Vector2(0.5, 0.125)
 text = "Main Menu"
 
-[node name="Details" type="MeshInstance3D" parent="."]
+[node name="Details" type="MeshInstance3D" parent="." unique_id=1134717937]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0.25, 0.1)
 material_override = SubResource("StandardMaterial3D_cwpr4")
 mesh = SubResource("TextMesh_siova")
 
-[node name="GradeMesh" type="MeshInstance3D" parent="."]
+[node name="GradeMesh" type="MeshInstance3D" parent="." unique_id=286790637]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.693, 0, 0.1)
 mesh = SubResource("QuadMesh_u7okp")
 
-[node name="NameLabel" type="MeshInstance3D" parent="."]
+[node name="NameLabel" type="MeshInstance3D" parent="." unique_id=960998814]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.925, 0.45, 0.1)
 material_override = ExtResource("6_2vw0d")
 mesh = SubResource("TextMesh_o35jt")
 
-[node name="FCMesh" type="MeshInstance3D" parent="."]
+[node name="FCMesh" type="MeshInstance3D" parent="." unique_id=353777539]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, -0.25, 0.1)
 mesh = SubResource("QuadMesh_eor5b")
 
-[node name="NRMesh" type="MeshInstance3D" parent="."]
+[node name="NRMesh" type="MeshInstance3D" parent="." unique_id=1570425623]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0.3, 0.1)
 mesh = SubResource("QuadMesh_k3idy")
 
-[node name="FCViewport" type="SubViewport" parent="."]
+[node name="FCViewport" type="SubViewport" parent="." unique_id=712138563]
 own_world_3d = true
 size = Vector2i(256, 48)
 
-[node name="FCLabel" type="RichTextLabel" parent="FCViewport"]
+[node name="FCLabel" type="RichTextLabel" parent="FCViewport" unique_id=1735740718]
 offset_right = 256.0
 offset_bottom = 48.0
 theme = SubResource("Theme_553gf")
@@ -1398,11 +1417,11 @@ bbcode_enabled = true
 text = "[center][wave amp=30 freq=8][rainbow freq=0.5 sat=0.7 val=2]Full Combo!"
 autowrap_mode = 0
 
-[node name="NRViewport" type="SubViewport" parent="."]
+[node name="NRViewport" type="SubViewport" parent="." unique_id=250541009]
 own_world_3d = true
 size = Vector2i(256, 48)
 
-[node name="NRLabel" type="RichTextLabel" parent="NRViewport"]
+[node name="NRLabel" type="RichTextLabel" parent="NRViewport" unique_id=569163403]
 offset_right = 256.0
 offset_bottom = 48.0
 theme = SubResource("Theme_553gf")
@@ -1411,11 +1430,11 @@ bbcode_enabled = true
 text = "[center][wave amp=30 freq=8][rainbow freq=0.5 sat=0.7 val=2]New Record!"
 autowrap_mode = 0
 
-[node name="GradeViewport" type="SubViewport" parent="."]
+[node name="GradeViewport" type="SubViewport" parent="." unique_id=506663113]
 own_world_3d = true
 size = Vector2i(256, 256)
 
-[node name="GradeLabel" type="RichTextLabel" parent="GradeViewport"]
+[node name="GradeLabel" type="RichTextLabel" parent="GradeViewport" unique_id=1028921712]
 offset_right = 256.0
 offset_bottom = 256.0
 theme = SubResource("Theme_553gf")
@@ -1424,10 +1443,10 @@ bbcode_enabled = true
 text = "[center][rainbow freq=0.5 sat=0.7 val=2]S"
 autowrap_mode = 0
 
-[node name="RaycastArea" type="Area3D" parent="."]
+[node name="RaycastArea" type="Area3D" parent="." unique_id=2138510616]
 script = ExtResource("6_25iqa")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="RaycastArea"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RaycastArea" unique_id=756845159]
 shape = SubResource("BoxShape3D_iqqq6")
 
 [connection signal="released" from="Repeat" to="." method="_on_Repeat_button_up"]

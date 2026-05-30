@@ -4,6 +4,7 @@ render_mode cull_disabled,diffuse_burley,specular_schlick_ggx;
 const float sub_emission_energy = 0.18;
 const float cut_white_margin = 0.04;
 
+uniform float metallic = 0.3;
 uniform vec4 color : source_color;
 uniform bool cutted = false;
 uniform float cut_dist_from_center = 0.0;
@@ -40,8 +41,8 @@ void fragment() {
 	}
 
 	ALBEDO = color.rgb;
-	METALLIC = 0.3;
-	ROUGHNESS = 0.2;
+	METALLIC = metallic;
+	ROUGHNESS = 0.22;
 	if (FRONT_FACING) {
 		float x_centered = UV.x - 0.25;
 		float y_centered = UV.y - 0.25;
