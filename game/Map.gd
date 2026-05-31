@@ -27,6 +27,8 @@ static var color_right: Color
 
 # yeah it was worth it aslong as i dont need to touch it thank you :>
 
+# fuck i need to touch this code UUUHUHUUHUHEHJEA>KLHAJHJNEA>LJGJE>AJFJK
+
 # long story short, each beatmap-element loading func splits into two threads:
 # one for parsing the top half of the array of dicts, and one for parsing the
 # bottom half.  these run concurrently, not quite halfing the time, but
@@ -168,7 +170,6 @@ static func load_arc_stack_v2(arc_data: Array) -> void:
 	load_range.bind(midpoint, arc_data.size()).call()
 	#arc_thread_1.wait_to_finish()
 	Utils.custom_thread_wait_to_finish(arc_thread_1)
-	
 
 static func load_event_stack_v2(event_data: Array) -> void:
 	var last_index := event_data.size() - 1
@@ -186,6 +187,9 @@ static func load_event_stack_v2(event_data: Array) -> void:
 	load_range.bind(midpoint, event_data.size()).call()
 	#event_thread_1.wait_to_finish()
 	Utils.custom_thread_wait_to_finish(event_thread_1)
+
+static func load_cutom_data_v2(custom_data: Array) -> void:
+	pass
 
 static func load_note_stack_v3(note_data: Array) -> void:
 	var last_index := note_data.size() - 1
@@ -292,6 +296,7 @@ static func load_event_stack_v3(event_data: Array) -> void:
 	#event_thread_1.wait_to_finish()
 	Utils.custom_thread_wait_to_finish(event_thread_1)
 
+
 static func load_beatmap(info: MapInfo, difficulty: DifficultyInfo, map_data: Dictionary) -> bool:
 	# Ensures the map_data dict has a version (some maps include the version only on info but not in the data)
 	if !map_data.has("_version") and !map_data.has("version"):
@@ -302,6 +307,7 @@ static func load_beatmap(info: MapInfo, difficulty: DifficultyInfo, map_data: Di
 	
 	if map_data.has("_version"):
 		#note_thread_0.start(load_note_stack_v2.bind(Utils.get_array(map_data, "_notes", [])))
+		load_cutom_data_v2(Utils.get_array(map_data, "_customData", []))
 		Utils.custom_thread_call(note_thread_0, load_note_stack_v2, [Utils.get_array(map_data, "_notes", [])])
 		#obstacle_thread_0.start(load_obstacle_stack_v2.bind(Utils.get_array(map_data, "_obstacles", [])))
 		Utils.custom_thread_call(obstacle_thread_0, load_obstacle_stack_v2, [Utils.get_array(map_data, "_obstacles", [])])
