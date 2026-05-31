@@ -96,6 +96,16 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 	else:
 		(collision_big.shape as BoxShape3D).size.y = 0.5
 	
+	offset_positions_array = []
+	offset_rotation_array = []
+	offset_scale_array = []
+	cube_dissolve_array = []
+	arrow_dissolve_array = []
+	dissolve = 1.0
+	arrow_dissolve = 1.0
+	interactible = true
+	is_fake = false
+	tracks = []
 	if note_info.custom_data.has("_position"):
 		var pos:Array = note_info.custom_data["_position"]
 		transform.origin = Vector3(pos[0]* 0.6,(pos[1]* 0.6) + Constants.LAYER_ZERO_Y,transform.origin.z)
@@ -105,10 +115,6 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 		offset.scale = offset.scale.max(Vector3.ONE*0.001)
 	if note_info.custom_data.has("_cutDirection"):
 		rotation_degrees.z = note_info.custom_data["_cutDirection"]
-	if note_info.custom_data.has("_track"):
-		var found_tracks:Array
-		for track in found_tracks:
-			tracks.append(StringName(track))
 	is_fake = false
 	if note_info.custom_data.has("_fake"):
 		is_fake = note_info.custom_data["_fake"]
@@ -124,15 +130,6 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 			disable_spawn_effect = note_info.custom_data["_disableSpawnEffect"]
 	# i SHOULD put this is a different class...
 	# :3
-	offset_positions_array = []
-	offset_rotation_array = []
-	offset_scale_array = []
-	cube_dissolve_array = []
-	arrow_dissolve_array = []
-	dissolve = 1.0
-	arrow_dissolve = 1.0
-	interactible = true
-	is_fake = false
 	if note_info.custom_data.has("_animation"):
 		for property in note_info.custom_data["_animation"]:
 			#print(property)
@@ -174,7 +171,8 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 					var dissolves:Array = note_info.custom_data["_animation"]["_dissolve"]
 					#print(dissolves)
 					if dissolves.size() == 1:
-						cube_dissolve_array = [dissolves[0][0]]
+						cube_dissolve_array = [[dissolves[0][0]]]
+						#cube_dissolve_array = dissolves
 						break
 					for arr:Array in dissolves:
 						var dissolve:float = arr[0]
@@ -184,7 +182,7 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 					var dissolves:Array = note_info.custom_data["_animation"]["_dissolveArrow"]
 					#print(dissolves)
 					if dissolves.size() == 1:
-						arrow_dissolve_array = [dissolves[0][0]]
+						arrow_dissolve_array = [[dissolves[0][0]]]
 						break
 					for arr:Array in dissolves:
 						var loc_dissolve:float = arr[0]

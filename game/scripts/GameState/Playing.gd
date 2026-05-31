@@ -38,6 +38,8 @@ var wall_template := load("res://game/Wall/Wall.tscn") as PackedScene
 var arc_template := load("res://game/Arc/Arc.tscn") as PackedScene
 const BEATS_AHEAD := 4.0
 
+var track_map:Dictionary[StringName,Array]
+
 func calcHjd(offset: float,bpm:float,njs:float) -> float:
 	var maxHalfJump := 17.999;
 	var num:float = 60 / bpm;
@@ -84,6 +86,14 @@ func _process_map(game: BeepSaber_Game) -> void:
 						njs,jd)
 		else:
 			note.spawn(note_info, current_beat, color,njs,jd)
+		if note_info.custom_data.has("_track"):
+			var found_tracks:Array
+			for track in found_tracks:
+				if track_map.has(track):
+					track_map[track].append(note)
+				else:
+					track_map[track] = [note]
+				note.just_released.connect(func() -> void: track_map[track].erase(note))
 		note_info_refs.append(note_info)
 		cube_refs.append(note)
 	
@@ -129,3 +139,5 @@ func _process_map(game: BeepSaber_Game) -> void:
 	
 	while not Map.event_stack.is_empty() and Map.event_stack[-1].beat <= current_beat:
 		game.event_driver.process_event(Map.event_stack.pop_back() as EventInfo)
+	
+	
