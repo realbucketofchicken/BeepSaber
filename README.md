@@ -1,8 +1,6 @@
 # Open Slice
 This is a fork of [Open Saber by LeandroDreamer](https://github.com/leandrodreamer/BeepSaber) which is a fork of [Beep Saber by NeoSpark314](https://github.com/NeoSpark314/BeepSaber) ported to Godot 4.7, with more modchart support.
 
-(The OQ Toolkit is only partially ported/patched for it to work on Godot 4 with OpenXR, most features that are not used in this project will not work)
-
 
 This fork tries to improve the experience, graphics and aims to make it more of it's own game instead of just a demo.
 
@@ -29,6 +27,12 @@ To export for android headsets the godot openxr vendors plugin may be needed
 There is one demo song included that is part of the deployed package.
 
 You can play custom songs by downloading them in the in-game menu. 
+
+## Current Progress:
+- **Mapping Extentions**: fully working
+- **Chroma**: working partially
+- **Noodle Extentions**: highly unfinished
+- **Vivify**: remains a dream... (although this exists https://github.com/V-Sekai/unidot_importer, so partial support may be possible)
 
 # Credits
 The included Music Track is Time Lapse by TheFatRat (https://www.youtube.com/watch?v=3fxq7kqyWO8)
