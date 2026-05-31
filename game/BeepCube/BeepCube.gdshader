@@ -6,6 +6,7 @@ uniform sampler2D texture_emission : hint_default_black;
 uniform sampler2D dissolve_texture;
 
 uniform float dissolve;
+uniform float arrow_dissolve;
 uniform float metallic;
 uniform float roughness;
 uniform float sub_emission_energy;
@@ -52,13 +53,15 @@ void fragment() {
 	) {
 		discard;
 	}
-
+	bool arrow;
 	ALBEDO = color.rgb;
 	METALLIC = metallic;
 	ROUGHNESS = roughness;
 	if (FRONT_FACING || (dissolve > 0.0)) {
 		vec2 dot_uv = vec2(UV.x+0.5, UV.y);
-		EMISSION = (color.rgb * sub_emission_energy) + texture(texture_emission, is_dot ? dot_uv : UV).rgb;
+		vec3 arrow_tex = texture(texture_emission, is_dot ? dot_uv : UV).rgb;
+		arrow = arrow_tex.r > 0.3;
+		EMISSION = (color.rgb * sub_emission_energy) + arrow_tex;
 		
 		if (is_chain_head) {
 			EMISSION += vec3( smoothstep(cut_white_margin+0.01,cut_white_margin,chain_interp) );
@@ -73,8 +76,15 @@ void fragment() {
 	} else {
 		EMISSION = vec3(1.0);
 	}
-	if (dissolve > 0.0){
-		if (texture(dissolve_texture,UV).r<dissolve){
+	if (dissolve > 0.0 || arrow_dissolve > 0.0){
+		float dissolve_tex = texture(dissolve_texture,UV).r;
+		if (dissolve_tex<dissolve && !arrow){
+			discard;
+		}
+		if (arrow && !FRONT_FACING){
+			discard;
+		}
+		if (dissolve_tex<arrow_dissolve && arrow){
 			discard;
 		}
 	}

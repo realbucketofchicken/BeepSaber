@@ -38,18 +38,32 @@ var wall_template := load("res://game/Wall/Wall.tscn") as PackedScene
 var arc_template := load("res://game/Arc/Arc.tscn") as PackedScene
 const BEATS_AHEAD := 4.0
 
+func calcHjd(offset: float,bpm:float,njs:float) -> float:
+	var maxHalfJump := 17.999;
+	var num:float = 60 / bpm;
+	var hjd:float = 4;
+	while (njs * num * hjd > maxHalfJump):
+		hjd /= 2;
+	if (hjd < 1): hjd = 1
+	return max(hjd + offset, 0.25);
+
+
+
+
 func _process_map(game: BeepSaber_Game) -> void:
 	if (Map.current_info == null):
 		return
 	
 	var njs:float = Map.current_difficulty.note_jump_movement_speed
-	var beat:float = Map.current_info.beats_per_minute / 60 
-	var jump_distance := Map.current_info.beats_per_minute / njs + Map.current_difficulty.note_jump_start_beat_offset/beat
-	var current_beat := game.song_player.get_playback_position() * (beat) 
-	# reaction time = JUMP DISTANCE / NJS 
-	var reaction_time:float = jump_distance / njs 
-	var look_ahead := current_beat + reaction_time*beat * Constants.BEAT_DISTANCE/2.0
-	print(look_ahead - current_beat," ",reaction_time/2," ",beat," ",current_beat," ",jump_distance)
+	var beats_per_second:float = Map.current_info.beats_per_minute / 60 
+	var current_beat := game.song_player.get_playback_position() * (beats_per_second) 
+	var bpm:float = Map.current_info.beats_per_minute
+	var hjd:float = calcHjd(Map.current_difficulty.note_jump_start_beat_offset,bpm,njs)
+	var jd:float = njs * (60 / bpm) * hjd *2
+	var rt:float = jd / (2 * njs)
+	var look_ahead := current_beat + rt*beats_per_second*2
+	print(rt/beats_per_second," ",jd," ",njs," ",look_ahead," ",current_beat)
+	#print(look_ahead - current_beat," ",reaction_time/2," ",beat," ",current_beat," ",jump_distance)
 	
 	# chains connect to a regular colornote and modify it, so we have to keep
 	# track of what notes were spawned this frame, in case any become the head
@@ -67,16 +81,16 @@ func _process_map(game: BeepSaber_Game) -> void:
 			note.spawn(note_info, current_beat, Color(note_info.custom_data["_color"][0], 
 						note_info.custom_data["_color"][1], 
 						note_info.custom_data["_color"][2]),
-						njs,reaction_time* Constants.BEAT_DISTANCE)
+						njs,jd)
 		else:
-			note.spawn(note_info, current_beat, color,njs,reaction_time* Constants.BEAT_DISTANCE)
+			note.spawn(note_info, current_beat, color,njs,jd)
 		note_info_refs.append(note_info)
 		cube_refs.append(note)
 	
 	# spawn bombs
 	while not Map.bomb_stack.is_empty() and Map.bomb_stack[-1].beat <= look_ahead:
 		var bomb := bomb_template.instantiate() as Bomb
-		bomb.spawn(Map.bomb_stack.pop_back() as BombInfo, current_beat,njs,reaction_time)
+		bomb.spawn(Map.bomb_stack.pop_back() as BombInfo, current_beat,njs,jd)
 		game.track.add_child(bomb)
 	
 	# spawn obstacles (walls)
@@ -84,9 +98,9 @@ func _process_map(game: BeepSaber_Game) -> void:
 		var wall := wall_template.instantiate() as Wall
 		var wall_info: = Map.obstacle_stack.pop_back() as ObstacleInfo
 		if wall_info.custom_data.has("_color"):
-			wall.spawn(wall_info, current_beat, Color(wall_info.custom_data["_color"][0], wall_info.custom_data["_color"][1], wall_info.custom_data["_color"][2]),njs,reaction_time)
+			wall.spawn(wall_info, current_beat, Color(wall_info.custom_data["_color"][0], wall_info.custom_data["_color"][1], wall_info.custom_data["_color"][2]),njs,jd)
 		else:
-			wall.spawn(wall_info, current_beat, Settings.default_values.obstacle_color,njs,reaction_time)
+			wall.spawn(wall_info, current_beat, Settings.default_values.obstacle_color,njs,jd)
 		game.track.add_child(wall)
 	
 	while not Map.arc_stack.is_empty() and Map.arc_stack[-1].head_beat <= look_ahead:
@@ -105,13 +119,13 @@ func _process_map(game: BeepSaber_Game) -> void:
 					break
 			cube_id -= 1
 		
-		arc.spawn(arc_info, current_beat,njs,reaction_time, cube)
+		arc.spawn(arc_info, current_beat,njs,jd, cube)
 		game.track.add_child(arc)
 	
 	while not Map.chain_stack.is_empty() and Map.chain_stack[-1].head_beat <= look_ahead:
 		var chain_info := Map.chain_stack.pop_back() as ChainInfo
 		if chain_info.slice_count > 1: # skip if the chain doesn't have any links
-			ChainLink.construct_chain(chain_info, current_beat, note_info_refs, cube_refs)
+			ChainLink.construct_chain(chain_info, current_beat, note_info_refs, cube_refs,njs,jd)
 	
 	while not Map.event_stack.is_empty() and Map.event_stack[-1].beat <= current_beat:
 		game.event_driver.process_event(Map.event_stack.pop_back() as EventInfo)

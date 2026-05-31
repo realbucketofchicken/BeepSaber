@@ -116,7 +116,7 @@ func set_saber(saber_path: String) -> void:
 
 func _handle_area_collided(area: Area3D) -> void:
 	if Scoreboard.paused: return
-	var cut_object := area.get_parent()
+	var cut_object := area.owner
 	if not cut_object is Cuttable: return
 	var note := cut_object as Cuttable
 	

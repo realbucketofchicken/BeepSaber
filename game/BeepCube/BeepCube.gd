@@ -9,6 +9,9 @@ signal cutted(correct_saber: bool)
 @export var collision_big :CollisionShape3D
 @export var collision_small :CollisionShape3D
 @export var slice_particles :BeepCubeSliceParticles
+@export var beep_cube_big: Area3D
+@export var beep_cube_small: Area3D
+@export var animation_player: AnimationPlayer
 
 var which_saber: int
 var is_dot: bool
@@ -22,10 +25,25 @@ var _mat: ShaderMaterial
 var piece_left : CutPiece = null
 var piece_right : CutPiece = null
 
+#####################
+# NOODLE EXTENTIONS #
+#####################
+var offset_positions_array:Array[Array]
+var offset_rotation_array:Array[Array]
+var offset_scale_array:Array[Array]
+var cube_dissolve_array:Array[Array]
+var arrow_dissolve_array:Array[Array]
 var tracks:Array[StringName]
 var is_fake:bool
 var interactible:bool
 var disable_spawn_effect:bool
+var position_offset:Vector3
+@export var offset: Node3D
+var start_z:float
+var dissolve:float
+var arrow_dissolve:float
+
+
 
 func _ready() -> void:
 	_mat = mi.material_override as ShaderMaterial
@@ -38,8 +56,8 @@ func _ready() -> void:
 	
 	# slice_particles are within cube's tree, but want then to move in global space
 	slice_particles.top_level = true
-	
-func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:float,reaction_time:float) -> void:
+
+func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:float,jd:float) -> void:
 	# re-enable our process_mode first otherwise it seems like Godot-internals
 	# can behave weirdly (ex. AnimationPlayer won't always play correctly)
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -52,7 +70,9 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 	var leftSide = false
 	var flipLineIndex = noteLineIndex * -1
 	var newLaneCount = 1000
-	
+	offset.position = Vector3.ZERO
+	offset.scale = Vector3.ONE
+	offset.rotation = Vector3.ZERO
 	if noteLineIndex >= 1000 or noteLineIndex <= -1000:
 		if sign(note_info.line_index) == 1:
 			transform.origin.x = ((note_info.line_index / 1000.0) - 2.5)
@@ -63,7 +83,9 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 		transform.origin.x = (note_info.line_index * 0.6) + Constants.LANE_ZERO_X
 		transform.origin.y = (note_info.line_layer * 0.6 ) + Constants.LAYER_ZERO_Y
 
-	transform.origin.z =-(njs*reaction_time/2)
+	transform.origin.z = -jd
+	start_z = -jd
+	
 	if note_info.cut_direction < 9:
 		rotation.z = Constants.CUBE_ROTATIONS[note_info.cut_direction] + deg_to_rad(note_info.angle_offset)
 	else:
@@ -79,7 +101,8 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 		transform.origin = Vector3(pos[0]* 0.6,(pos[1]* 0.6) + Constants.LAYER_ZERO_Y,transform.origin.z)
 	if note_info.custom_data.has("_scale"):
 		var scales:Array = note_info.custom_data["_scale"]
-		scale = Vector3(scales[0],scales[1],scales[2])
+		offset.scale = Vector3(scales[0],scales[1],scales[2])
+		offset.scale = offset.scale.max(Vector3.ONE*0.001)
 	if note_info.custom_data.has("_cutDirection"):
 		rotation_degrees.z = note_info.custom_data["_cutDirection"]
 	if note_info.custom_data.has("_track"):
@@ -92,9 +115,81 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 	interactible = true
 	if note_info.custom_data.has("_interactable"):
 		interactible = note_info.custom_data["_interactable"]
+		print("INTERACT: ", interactible)
 	disable_spawn_effect = false
 	if note_info.custom_data.has("_disableSpawnEffect"):
-		disable_spawn_effect = note_info.custom_data["_disableSpawnEffect"]
+		if note_info.custom_data["_disableSpawnEffect"] is String:
+			disable_spawn_effect = note_info.custom_data["_disableSpawnEffect"] == "true"
+		else:
+			disable_spawn_effect = note_info.custom_data["_disableSpawnEffect"]
+	# i SHOULD put this is a different class...
+	# :3
+	offset_positions_array = []
+	offset_rotation_array = []
+	offset_scale_array = []
+	cube_dissolve_array = []
+	arrow_dissolve_array = []
+	dissolve = 1.0
+	arrow_dissolve = 1.0
+	interactible = true
+	is_fake = false
+	if note_info.custom_data.has("_animation"):
+		for property in note_info.custom_data["_animation"]:
+			#print(property)
+			match property:
+				"_position":
+					var positions:Array = note_info.custom_data["_animation"]["_position"]
+					#print(positions)
+					if positions.size() == 1:
+						var pos:Vector3 = Vector3(positions[0][0],positions[0][1],positions[0][2])
+						offset_positions_array = [[pos]]
+						break
+					for arr:Array in positions:
+						var pos:Vector3 = Vector3(arr[0],arr[1],arr[2])
+						var sub_info_array = [pos,arr[3],InterpolationHelper.Easings.get_easing_type(arr.get(4)) if arr.size() == 5 else -1]
+						offset_positions_array.append(sub_info_array)
+				"_rotation":
+					var rotations:Array = note_info.custom_data["_animation"]["_rotation"]
+					#print(rotations)
+					if rotations.size() == 1:
+						var rot:Vector3 = Vector3(rotations[0][0],rotations[0][1],rotations[0][2])
+						offset_rotation_array = [[rot]]
+						break
+					for arr:Array in rotations:
+						var rot:Vector3 = Vector3(arr[0],arr[1],arr[2])
+						var sub_info_array = [rot,arr[3],InterpolationHelper.Easings.get_easing_type(arr.get(4)) if arr.size() == 5 else -1]
+						offset_rotation_array.append(sub_info_array)
+				"_scale":
+					var scales:Array = note_info.custom_data["_animation"]["_scale"]
+					#print(scales)
+					if scales.size() == 1:
+						var scl:Vector3 = Vector3(scales[0][0],scales[0][1],scales[0][2])
+						offset_scale_array = [[scl]]
+						break
+					for arr:Array in scales:
+						var scl:Vector3 = Vector3(arr[0],arr[1],arr[2])
+						var sub_info_array = [scl,arr[3],InterpolationHelper.Easings.get_easing_type(arr.get(4)) if arr.size() == 5 else -1]
+						offset_scale_array.append(sub_info_array)
+				"_dissolve":
+					var dissolves:Array = note_info.custom_data["_animation"]["_dissolve"]
+					#print(dissolves)
+					if dissolves.size() == 1:
+						cube_dissolve_array = [dissolves[0][0]]
+						break
+					for arr:Array in dissolves:
+						var dissolve:float = arr[0]
+						var sub_info_array = [dissolve,arr[1],InterpolationHelper.Easings.get_easing_type(arr.get(2))if arr.size() == 3 else -1]
+						cube_dissolve_array.append(sub_info_array)
+				"_dissolveArrow":
+					var dissolves:Array = note_info.custom_data["_animation"]["_dissolveArrow"]
+					#print(dissolves)
+					if dissolves.size() == 1:
+						arrow_dissolve_array = [dissolves[0][0]]
+						break
+					for arr:Array in dissolves:
+						var loc_dissolve:float = arr[0]
+						var sub_info_array = [loc_dissolve,arr[1],InterpolationHelper.Easings.get_easing_type(arr.get(2)) if arr.size() == 3 else -1]
+						arrow_dissolve_array.append(sub_info_array)
 	
 	piece_left.set_color(color)
 	piece_right.set_color(color)
@@ -111,24 +206,62 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 	# smalling collision shape, while similar collision layers (ie right note &
 	# right saber) are placed on the larger collision shape.
 	var is_left_note := note_info.color == 0
-	var big_coll_area := $BeepCube_Big as Area3D
-	big_coll_area.collision_layer = 0x0
-	big_coll_area.set_collision_layer_value(CollisionLayerConstants.LeftNote_bit, is_left_note)
-	big_coll_area.set_collision_layer_value(CollisionLayerConstants.RightNote_bit, not is_left_note)
-	var small_coll_area := $BeepCube_Small as Area3D
-	small_coll_area.collision_layer = 0x0
-	small_coll_area.set_collision_layer_value(CollisionLayerConstants.LeftNote_bit, true)
-	small_coll_area.set_collision_layer_value(CollisionLayerConstants.RightNote_bit, true)
+	beep_cube_big.collision_layer = 0x0
+	beep_cube_big.set_collision_layer_value(CollisionLayerConstants.LeftNote_bit, is_left_note)
+	beep_cube_big.set_collision_layer_value(CollisionLayerConstants.RightNote_bit, not is_left_note)
+	beep_cube_small.collision_layer = 0x0
+	beep_cube_small.set_collision_layer_value(CollisionLayerConstants.LeftNote_bit, true)
+	beep_cube_small.set_collision_layer_value(CollisionLayerConstants.RightNote_bit, true)
 	
 	# play the spawn animation when this cube enters the scene
-	var anim := $AnimationPlayer as AnimationPlayer
 	var anim_speed := Map.current_difficulty.note_jump_movement_speed / 9.0
-	anim.speed_scale = maxf(min_speed,anim_speed)
+	animation_player.speed_scale = maxf(min_speed,anim_speed)
 	if !disable_spawn_effect:
-		anim.play(&"Spawn")
+		animation_player.play(&"Spawn")
 	
 	slice_particles.reset()
 	mi.visible = true
+
+func _physics_process(delta: float) -> void:
+	super(delta)
+	var current_progress:float
+	current_progress = -transform.origin.z/start_z
+	if !offset_positions_array.is_empty():
+		if offset_positions_array.size() == 1:
+			offset.position = offset_positions_array[0][0]
+		else:
+			offset.position = InterpolationHelper.get_animation(offset_positions_array,current_progress)
+	if !offset_rotation_array.is_empty():
+		if offset_rotation_array.size() == 1:
+			offset.rotation = offset_rotation_array[0][0]
+		else:
+			offset.rotation = InterpolationHelper.get_animation_rotations(offset_rotation_array,current_progress)
+	if !offset_scale_array.is_empty():
+		if offset_scale_array.size() == 1:
+			offset.scale = offset_scale_array[0][0]
+			offset.scale = offset.scale.max(Vector3.ONE*0.001)
+		else:
+			offset.scale = InterpolationHelper.get_animation(offset_scale_array,current_progress)
+			offset.scale = offset.scale.max(Vector3.ONE*0.001)
+	if !cube_dissolve_array.is_empty():
+		if cube_dissolve_array.size() == 1:
+			#print(cube_dissolve_array)
+			if cube_dissolve_array[0].size() == 1:
+				dissolve = cube_dissolve_array[0][0]
+		else:
+			dissolve = InterpolationHelper.get_animation(cube_dissolve_array,current_progress)
+	if !arrow_dissolve_array.is_empty():
+		if arrow_dissolve_array.size() == 1:
+			#print(arrow_dissolve_array)
+			if arrow_dissolve_array[0].size() == 1:
+				arrow_dissolve = arrow_dissolve_array[0][0]
+		else:
+			arrow_dissolve = InterpolationHelper.get_animation(arrow_dissolve_array,current_progress)
+	
+	
+	_mat.set_shader_parameter(&"dissolve", 1.0-dissolve)
+	_mat.set_shader_parameter(&"arrow_dissolve", 1.0-arrow_dissolve)
+
 
 # call this when clearing the track
 func clear_from_track() -> void:
@@ -162,6 +295,7 @@ func set_collision_disabled(value: bool) -> void:
 
 func cut(saber_type: int, cut_speed: Vector3, cut_plane: Plane, controller: BeepSaberController,area:Area3D) -> void:
 	if !interactible:
+		print("NOT INTERACTIBLE")
 		return
 	# compute the angle between the cube orientation and the cut direction
 	var cut_direction_xy := -Vector3(cut_speed.x, cut_speed.y, 0.0).normalized()

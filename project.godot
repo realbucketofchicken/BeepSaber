@@ -60,7 +60,7 @@ project/assembly_name="Open Saber"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/stopwatch/plugin.cfg")
+enabled=PackedStringArray("res://addons/SimpleTODO/plugin.cfg", "res://addons/stopwatch/plugin.cfg")
 
 [filesystem]
 

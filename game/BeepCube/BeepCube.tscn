@@ -6,6 +6,31 @@
 [ext_resource type="Texture2D" uid="uid://drc5tdiltfqnk" path="res://game/BeepCube/BeepCubeEmission.png" id="4_10m2m"]
 [ext_resource type="PackedScene" uid="uid://cplhsipk6vhem" path="res://game/BeepCube/BeepCube_SliceParticles.tscn" id="5_tissj"]
 
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_7qxyk"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_x86ma"]
+noise = SubResource("FastNoiseLite_7qxyk")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_x86ma"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("3_7slj3")
+shader_parameter/color = Color(1, 1, 1, 1)
+shader_parameter/texture_emission = ExtResource("4_10m2m")
+shader_parameter/dissolve_texture = SubResource("NoiseTexture2D_x86ma")
+shader_parameter/dissolve = 0.0
+shader_parameter/arrow_dissolve = 0.0
+shader_parameter/metallic = 0.75
+shader_parameter/roughness = 0.22
+shader_parameter/sub_emission_energy = 0.0
+shader_parameter/cutted = false
+shader_parameter/cut_dist_from_center = 0.0
+shader_parameter/cut_vanish = 0.0
+shader_parameter/cut_angle = 0.0
+shader_parameter/cut_white_margin = 0.04
+shader_parameter/is_dot = false
+shader_parameter/is_chain_head = false
+
 [sub_resource type="BoxShape3D" id="1"]
 size = Vector3(0.82714844, 0.5979004, 1)
 
@@ -84,63 +109,45 @@ _data = {
 &"Spawn": SubResource("3")
 }
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_7qxyk"]
-
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_x86ma"]
-noise = SubResource("FastNoiseLite_7qxyk")
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_x86ma"]
-resource_local_to_scene = true
-render_priority = 0
-shader = ExtResource("3_7slj3")
-shader_parameter/color = Color(1, 1, 1, 1)
-shader_parameter/texture_emission = ExtResource("4_10m2m")
-shader_parameter/dissolve_texture = SubResource("NoiseTexture2D_x86ma")
-shader_parameter/dissolve = 0.0
-shader_parameter/metallic = 0.75
-shader_parameter/roughness = 0.22
-shader_parameter/sub_emission_energy = 0.0
-shader_parameter/cutted = false
-shader_parameter/cut_dist_from_center = 0.0
-shader_parameter/cut_vanish = 0.0
-shader_parameter/cut_angle = 0.0
-shader_parameter/cut_white_margin = 0.04
-shader_parameter/is_dot = false
-shader_parameter/is_chain_head = false
-
-[node name="BeepCube" type="Node3D" unique_id=1480937251 node_paths=PackedStringArray("mi", "collision_big", "collision_small", "slice_particles")]
+[node name="BeepCube" type="Node3D" unique_id=1480937251 node_paths=PackedStringArray("mi", "collision_big", "collision_small", "slice_particles", "beep_cube_big", "beep_cube_small", "animation_player", "offset")]
 script = ExtResource("1_7mymb")
-mi = NodePath("BeepCubeMesh/BeepCubeMesh")
-collision_big = NodePath("BeepCube_Big/CollisionBig")
-collision_small = NodePath("BeepCube_Small/CollisionSmall")
-slice_particles = NodePath("SliceParticles")
+mi = NodePath("Offset/BeepCubeMesh/BeepCubeMesh")
+collision_big = NodePath("Offset/BeepCube_Big/CollisionBig")
+collision_small = NodePath("Offset/BeepCube_Small/CollisionSmall")
+slice_particles = NodePath("Offset/SliceParticles")
+beep_cube_big = NodePath("Offset/BeepCube_Big")
+beep_cube_small = NodePath("Offset/BeepCube_Small")
+animation_player = NodePath("Offset/AnimationPlayer")
+offset = NodePath("Offset")
 
-[node name="BeepCube_Big" type="Area3D" parent="." unique_id=1395643966 groups=["beepcube"]]
+[node name="Offset" type="Node3D" parent="." unique_id=1460513517]
+
+[node name="BeepCubeMesh" parent="Offset" unique_id=842838808 instance=ExtResource("2_sbb11")]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0, 0)
+
+[node name="BeepCubeMesh" parent="Offset/BeepCubeMesh" index="0" unique_id=1051909769]
+layers = 3
+material_override = SubResource("ShaderMaterial_x86ma")
+
+[node name="BeepCube_Big" type="Area3D" parent="Offset" unique_id=1395643966 groups=["beepcube"]]
 monitoring = false
 
-[node name="CollisionBig" type="CollisionShape3D" parent="BeepCube_Big" unique_id=473421397]
+[node name="CollisionBig" type="CollisionShape3D" parent="Offset/BeepCube_Big" unique_id=473421397]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.25)
 shape = SubResource("1")
 disabled = true
 
-[node name="BeepCube_Small" type="Area3D" parent="." unique_id=1253656530 groups=["beepcube"]]
+[node name="BeepCube_Small" type="Area3D" parent="Offset" unique_id=1253656530 groups=["beepcube"]]
 monitoring = false
 
-[node name="CollisionSmall" type="CollisionShape3D" parent="BeepCube_Small" unique_id=1151495483]
+[node name="CollisionSmall" type="CollisionShape3D" parent="Offset/BeepCube_Small" unique_id=1151495483]
 shape = SubResource("2")
 disabled = true
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1568566500]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Offset" unique_id=1568566500]
 root_node = NodePath("../BeepCubeMesh")
 libraries/ = SubResource("AnimationLibrary_7xfev")
 
-[node name="BeepCubeMesh" parent="." unique_id=842838808 instance=ExtResource("2_sbb11")]
-transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0, 0)
+[node name="SliceParticles" parent="Offset" unique_id=487635705 instance=ExtResource("5_tissj")]
 
-[node name="BeepCubeMesh" parent="BeepCubeMesh" index="0" unique_id=1051909769]
-layers = 3
-material_override = SubResource("ShaderMaterial_x86ma")
-
-[node name="SliceParticles" parent="." unique_id=487635705 instance=ExtResource("5_tissj")]
-
-[editable path="BeepCubeMesh"]
+[editable path="Offset/BeepCubeMesh"]

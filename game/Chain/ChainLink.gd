@@ -22,7 +22,7 @@ func _ready() -> void:
 	piece_left.set_chain_head(false)
 	piece_right.set_chain_head(false)
 
-static func construct_chain(chain_info: ChainInfo, current_beat: float, note_info_refs: Array[ColorNoteInfo], cube_refs: Array[BeepCube]) -> void:
+static func construct_chain(chain_info: ChainInfo, current_beat: float, note_info_refs: Array[ColorNoteInfo], cube_refs: Array[BeepCube],njs:float,jd:float) -> void:
 	# instead of just making a new note head for a new chain, beat saber
 	# modifies an already-existing note to be the head, which is why we have to
 	# do all this garbage with keeping references to other notes that were
@@ -58,16 +58,16 @@ static func construct_chain(chain_info: ChainInfo, current_beat: float, note_inf
 	i = 1
 	while i < chain_info.slice_count:
 		var chain_link := GlobalReferences.link_pool.acquire() as ChainLink
-		chain_link.spawn(chain_info, current_beat, head_pos, tail_pos, mid_pos, i)
+		chain_link.spawn(chain_info, current_beat, head_pos, tail_pos, mid_pos, i,njs,jd)
 		i += 1
 
-func spawn(chain_info: ChainInfo, current_beat: float, head_pos: Vector2, tail_pos: Vector2, mid_pos: Vector2, link_index: int) -> void:
+func spawn(chain_info: ChainInfo, current_beat: float, head_pos: Vector2, tail_pos: Vector2, mid_pos: Vector2, link_index: int,njs:float,jd:float) -> void:
 	# re-enable our process_mode first otherwise it seems like Godot-internals
 	# can behave weirdly (ex. AnimationPlayer won't always play correctly)
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	
 	var color := Map.color_left if chain_info.color == 0 else Map.color_right
-	speed = Constants.BEAT_DISTANCE * Map.current_info.beats_per_minute * 0.016666666666666667
+	speed = njs
 	which_saber = chain_info.color
 	
 	var lerp_factor := float(link_index) / float(chain_info.slice_count - 1) * chain_info.squish_factor
@@ -79,7 +79,7 @@ func spawn(chain_info: ChainInfo, current_beat: float, head_pos: Vector2, tail_p
 	
 	transform.origin.x = bezier_pos.x
 	transform.origin.y = bezier_pos.y
-	transform.origin.z = -(beat - current_beat) * Constants.BEAT_DISTANCE
+	transform.origin.z = -jd
 	
 	rotation.z = q0.angle_to_point(q1) - TAU*0.25
 	
