@@ -25,6 +25,7 @@ var piece_right : CutPiece = null
 var tracks:Array[StringName]
 var is_fake:bool
 var interactible:bool
+var disable_spawn_effect:bool
 
 func _ready() -> void:
 	_mat = mi.material_override as ShaderMaterial
@@ -38,11 +39,11 @@ func _ready() -> void:
 	# slice_particles are within cube's tree, but want then to move in global space
 	slice_particles.top_level = true
 	
-func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color) -> void:
+func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:float,reaction_time:float) -> void:
 	# re-enable our process_mode first otherwise it seems like Godot-internals
 	# can behave weirdly (ex. AnimationPlayer won't always play correctly)
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	speed = Constants.BEAT_DISTANCE * Map.current_info.beats_per_minute * 0.016666666666666667
+	speed = njs
 	beat = note_info.beat
 	which_saber = note_info.color
 	is_dot = note_info.cut_direction == 8
@@ -62,7 +63,7 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color) -> void
 		transform.origin.x = (note_info.line_index * 0.6) + Constants.LANE_ZERO_X
 		transform.origin.y = (note_info.line_layer * 0.6 ) + Constants.LAYER_ZERO_Y
 
-	transform.origin.z = - (note_info.beat - current_beat) * Constants.BEAT_DISTANCE
+	transform.origin.z =-(njs*reaction_time/2)
 	if note_info.cut_direction < 9:
 		rotation.z = Constants.CUBE_ROTATIONS[note_info.cut_direction] + deg_to_rad(note_info.angle_offset)
 	else:
@@ -85,10 +86,15 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color) -> void
 		var found_tracks:Array
 		for track in found_tracks:
 			tracks.append(StringName(track))
+	is_fake = false
 	if note_info.custom_data.has("_fake"):
 		is_fake = note_info.custom_data["_fake"]
+	interactible = true
 	if note_info.custom_data.has("_interactable"):
 		interactible = note_info.custom_data["_interactable"]
+	disable_spawn_effect = false
+	if note_info.custom_data.has("_disableSpawnEffect"):
+		disable_spawn_effect = note_info.custom_data["_disableSpawnEffect"]
 	
 	piece_left.set_color(color)
 	piece_right.set_color(color)
@@ -118,7 +124,8 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color) -> void
 	var anim := $AnimationPlayer as AnimationPlayer
 	var anim_speed := Map.current_difficulty.note_jump_movement_speed / 9.0
 	anim.speed_scale = maxf(min_speed,anim_speed)
-	anim.play(&"Spawn")
+	if !disable_spawn_effect:
+		anim.play(&"Spawn")
 	
 	slice_particles.reset()
 	mi.visible = true
@@ -143,7 +150,8 @@ func make_chain_head() -> void:
 	piece_right.set_chain_head(true)
 
 func on_miss() -> void:
-	Scoreboard.reset_combo()
+	if !is_fake:
+		Scoreboard.reset_combo()
 	hide_cube()
 	release()
 

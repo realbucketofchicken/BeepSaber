@@ -1,0 +1,90 @@
+[gd_scene format=3 uid="uid://yf8y5e74vv4o"]
+
+[ext_resource type="Script" uid="uid://c6ams44cvytp8" path="res://addons/SimpleTODO/TODO.gd" id="1_wo5wb"]
+
+[sub_resource type="DPITexture" id="DPITexture_32ygo"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#e0e0e0\" d=\"m7 1v6h-6v2h6v6h2v-6h6v-2h-6v-6z\"/></svg>
+"
+color_map = {
+Color(1, 0.37254903, 0.37254903, 1): Color(1, 0.47, 0.42, 1),
+Color(0.37254903, 1, 0.5921569, 1): Color(0.45, 0.95, 0.5, 1),
+Color(1, 0.8666667, 0.39607844, 1): Color(0.83, 0.78, 0.62, 1)
+}
+
+[node name="TODO" type="Control" unique_id=1317409297]
+clip_contents = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_wo5wb")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=829114626]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer" unique_id=2110498781]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/PanelContainer" unique_id=289895078]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/PanelContainer/VBoxContainer" unique_id=847637694]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/PanelContainer/VBoxContainer/MarginContainer" unique_id=669549944]
+layout_mode = 2
+theme_override_constants/separation = 100
+
+[node name="AddColumn" type="Button" parent="VBoxContainer/PanelContainer/VBoxContainer/MarginContainer/HBoxContainer" unique_id=1040795978]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 2
+text = "Add Column"
+icon = SubResource("DPITexture_32ygo")
+
+[node name="LineEdit" type="LineEdit" parent="VBoxContainer/PanelContainer/VBoxContainer/MarginContainer/HBoxContainer" unique_id=43839202]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+placeholder_text = "Search Items"
+clear_button_enabled = true
+
+[node name="Total" type="Label" parent="VBoxContainer/PanelContainer/VBoxContainer/MarginContainer" unique_id=219544177]
+unique_name_in_owner = true
+auto_translate_mode = 2
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Total: 0"
+horizontal_alignment = 1
+metadata/_edit_lock_ = true
+
+[node name="ColumnMirror" type="Control" parent="VBoxContainer/PanelContainer/VBoxContainer" unique_id=1661071181]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer" unique_id=898795049]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Columns" type="HBoxContainer" parent="VBoxContainer/ScrollContainer" unique_id=751935778]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[connection signal="pressed" from="VBoxContainer/PanelContainer/VBoxContainer/MarginContainer/HBoxContainer/AddColumn" to="." method="add_column" binds= [true]]
+[connection signal="text_changed" from="VBoxContainer/PanelContainer/VBoxContainer/MarginContainer/HBoxContainer/LineEdit" to="." method="filter_elements"]

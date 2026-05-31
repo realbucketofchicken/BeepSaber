@@ -18,9 +18,9 @@ var activator_cube: BeepCube
 var speed: float
 var despawn_z: float
 
-func spawn(info: ArcInfo, current_beat: float, _activator_cube: BeepCube = null) -> void:
+func spawn(info: ArcInfo, current_beat: float,njs:float,reaction_time:float, _activator_cube: BeepCube = null) -> void:
 	arc_info = info
-	speed = Constants.BEAT_DISTANCE * Map.current_info.beats_per_minute * 0.016666666666666667
+	speed = njs
 	visual = $Path3D/Visual
 	visual.material_override = right_material if arc_info.color == 1 else left_material
 	activator_cube = _activator_cube

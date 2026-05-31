@@ -160,8 +160,8 @@ func _input(event: InputEvent) -> void:
 			var move := Vector3(eventMouse.relative.x, -eventMouse.relative.y, 0.0)
 			_interact_move_controller(move * controller_move_speed, Vector3.ZERO)
 		else:
-			var yaw := eventMouse.relative.x
-			var pitch := eventMouse.relative.y
+			var yaw := eventMouse.relative.x /10.0
+			var pitch := eventMouse.relative.y /10.0
 			vr.vrCamera.rotate_y(deg_to_rad(-yaw))
 			vr.vrCamera.rotate_object_local(Vector3(1,0,0), deg_to_rad(-pitch))
 	_update_virtual_controller_position()

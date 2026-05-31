@@ -7,10 +7,10 @@
 [ext_resource type="PackedScene" uid="uid://cplhsipk6vhem" path="res://game/BeepCube/BeepCube_SliceParticles.tscn" id="5_tissj"]
 
 [sub_resource type="BoxShape3D" id="1"]
-size = Vector3(0.8, 0.5, 1)
+size = Vector3(0.82714844, 0.5979004, 1)
 
 [sub_resource type="BoxShape3D" id="2"]
-size = Vector3(0.375, 0.375, 0.375)
+size = Vector3(0.4580078, 0.47460938, 0.4736328)
 
 [sub_resource type="Animation" id="Animation_tbh3g"]
 length = 0.001
@@ -48,10 +48,10 @@ tracks/0/path = NodePath(".:position")
 tracks/0/interp = 2
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0.3, 0.6, 0.8, 1.1, 1.2666667, 1.4666667, 1.8),
+"times": PackedFloat32Array(0.13333334, 0.36666667, 0.6666667, 0.8666667, 1.1, 1.3000001, 1.6333333),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
 "update": 0,
-"values": [Vector3(0, 0.6, 0), Vector3(0, 0.5, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0.01, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
+"values": [Vector3(0, 0.6, -2), Vector3(0, 0.5, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0.01, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -60,7 +60,7 @@ tracks/1/path = NodePath(".:scale")
 tracks/1/interp = 2
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.3, 0.8, 1.1, 1.34),
+"times": PackedFloat32Array(0, 0.2, 0.6333333, 0.8333333, 1.34),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0.1, 0.1, 0.1), Vector3(1, 1, 1), Vector3(1, 1, 1), Vector3(1, 1, 1)]
@@ -72,7 +72,7 @@ tracks/2/path = NodePath(".:rotation")
 tracks/2/interp = 2
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0, 1.063633, 1.8),
+"times": PackedFloat32Array(0, 0.39999998, 0.8666667),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
 "values": [Vector3(0, 0, 3.1415927), Vector3(0, 0, 0), Vector3(0, 0, 0)]
@@ -137,7 +137,7 @@ libraries/ = SubResource("AnimationLibrary_7xfev")
 [node name="BeepCubeMesh" parent="." unique_id=842838808 instance=ExtResource("2_sbb11")]
 transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0, 0)
 
-[node name="BeepCubeMesh" parent="BeepCubeMesh" index="0" unique_id=124202617]
+[node name="BeepCubeMesh" parent="BeepCubeMesh" index="0" unique_id=1051909769]
 layers = 3
 material_override = SubResource("ShaderMaterial_x86ma")
 

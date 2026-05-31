@@ -23,7 +23,7 @@ func _physics_process(delta: float) -> void :
 	if transform.origin.z - m.size.z/2 > despawn_z:
 		queue_free()
 
-func spawn(wall_info: ObstacleInfo, current_beat: float, color: Color) -> void :
+func spawn(wall_info: ObstacleInfo, current_beat: float, color: Color,njs:float,reaction_time:float) -> void :
 
 	$WallMeshOrientation / WallMesh.material_override.set_shader_parameter(&"albedo_color", color)
 	var mesh: = $WallMeshOrientation / WallMesh as MeshInstance3D
@@ -74,12 +74,12 @@ func spawn(wall_info: ObstacleInfo, current_beat: float, color: Color) -> void :
 	var z = wall_info.duration * Constants.BEAT_DISTANCE
 
 	var depth = z * 0.5
-	m.size.x = x
-	shape.size.x = x
-	m.size.y = y
-	shape.size.y = y
-	m.size.z = z
-	shape.size.z = z
+	m.size.x = abs(x) # REMOVE ABS IF CAUSING ISSUES!!!
+	shape.size.x = abs(x) # REMOVE ABS IF CAUSING ISSUES!!!
+	m.size.y = abs(y) # REMOVE ABS IF CAUSING ISSUES!!!
+	shape.size.y = abs(y) # REMOVE ABS IF CAUSING ISSUES!!!
+	m.size.z = abs(z) # REMOVE ABS IF CAUSING ISSUES!!!
+	shape.size.z = abs(z) # REMOVE ABS IF CAUSING ISSUES!!!
 	
 	(mesh.material_override as ShaderMaterial).set_shader_parameter(&"size", Vector3(x, y, z))
 	
@@ -103,11 +103,11 @@ func spawn(wall_info: ObstacleInfo, current_beat: float, color: Color) -> void :
 		else:
 			transform.origin.x = (wall_info.line_index - ((4 - wallWidth) * 0.5)) * Constants.LANE_DISTANCE
 			transform.origin.y = (wall_info.line_layer + (wallHeight * 0.5)) * Constants.LANE_DISTANCE
-		transform.origin.z = - (wall_info.beat - current_beat) * Constants.BEAT_DISTANCE
+		transform.origin.z =-(njs*reaction_time/2)
 	else:
 		transform.origin.x = (wall_info.line_index - ((4 - wallWidth) * 0.5)) * Constants.LANE_DISTANCE
 		transform.origin.y = (wall_info.line_layer + (wallHeight * 0.5)) * Constants.LANE_DISTANCE
-		transform.origin.z = (current_beat - wall_info.beat) * Constants.BEAT_DISTANCE - depth
+		transform.origin.z =-(njs*reaction_time/2) # - depth #HUH
 	#print(m.size.y)
 	speed = Constants.BEAT_DISTANCE * Map.current_info.beats_per_minute / 60.0
 	($AnimationPlayer as AnimationPlayer).play(&"Spawn")

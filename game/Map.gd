@@ -24,6 +24,9 @@ static var color_right: Color
 # 29 milliseconds.  takes just over half as long as before, very worth the
 # nightmare code i've written.
 #
+
+# yeah it was worth it aslong as i dont need to touch it thank you :>
+
 # long story short, each beatmap-element loading func splits into two threads:
 # one for parsing the top half of the array of dicts, and one for parsing the
 # bottom half.  these run concurrently, not quite halfing the time, but

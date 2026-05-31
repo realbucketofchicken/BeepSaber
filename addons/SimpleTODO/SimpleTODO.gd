@@ -1,0 +1,196 @@
+@tool
+extends "ExtendedEditorPlugin.gd"
+
+const TEXT_DATA_SETTING = "addons/simple_todo/text_data_file"
+const IMAGE_DATA_SETTING = "addons/simple_todo/image_data_file"
+
+var text_data_file := "res://TODO.cfg"
+var image_data_file := "res://TODO.bin"
+
+var pending_columns: Array[Control]
+
+var todo_screen: Control
+var image_database: Dictionary[Image, String]
+
+func _get_plugin_name():
+	return "TODO"
+
+func _get_plugin_icon():
+	return preload("uid://s166pjhwlrpj")
+
+func _has_main_screen() -> bool:
+	return true
+
+func _init() -> void:
+	add_plugin_translations_from_directory("res://addons/SimpleTODO/Translations")
+
+func _enter_tree():
+	text_data_file = define_project_setting(TEXT_DATA_SETTING, text_data_file, PROPERTY_HINT_SAVE_FILE)
+	image_data_file = define_project_setting(IMAGE_DATA_SETTING, image_data_file, PROPERTY_HINT_SAVE_FILE)
+	track_project_setting(TEXT_DATA_SETTING)
+	track_project_setting(IMAGE_DATA_SETTING)
+	
+	todo_screen = preload("res://addons/SimpleTODO/TODO.tscn").instantiate()
+	todo_screen.hide()
+	todo_screen.save_needed.connect(save_data)
+	
+	get_editor_interface().get_editor_main_screen().add_child(todo_screen)
+	load_data()
+
+func _ready() -> void:
+	set_process_input(false)
+
+func _on_setting_changed(setting: String):
+	if setting == TEXT_DATA_SETTING:
+		var new_text_data_file: String = ProjectSettings.get_setting(TEXT_DATA_SETTING)
+		if new_text_data_file != text_data_file:
+			var da := DirAccess.open("res://")
+			da.rename(text_data_file, new_text_data_file)
+			
+			EditorInterface.get_resource_filesystem().update_file(text_data_file)
+			EditorInterface.get_resource_filesystem().update_file(new_text_data_file)
+			text_data_file = new_text_data_file
+	elif setting == IMAGE_DATA_SETTING:
+		var new_image_data_file: String = ProjectSettings.get_setting(IMAGE_DATA_SETTING)
+		if new_image_data_file != image_data_file:
+			var da := DirAccess.open("res://")
+			da.rename(image_data_file, new_image_data_file)
+			
+			EditorInterface.get_resource_filesystem().update_file(image_data_file)
+			EditorInterface.get_resource_filesystem().update_file(new_image_data_file)
+			image_data_file = new_image_data_file
+
+func _process(delta: float) -> void:
+	if pending_columns.is_empty():
+		set_process(false)
+		print("TODO loaded")
+		return
+	
+	var column = pending_columns.pop_front()
+	todo_screen.column_container.add_child(column)
+
+func _set_window_layout(configuration: ConfigFile):
+	if configuration.has_section("SimpleTODO"):
+		var minimized_tabs = configuration.get_value("SimpleTODO", "minimized_tabs")
+		
+		if minimized_tabs.size() <= 0:
+			return
+		
+		for i in todo_screen.column_container.get_child_count():
+			var column: PanelContainer = todo_screen.column_container.get_child(i)
+			column.set_minimized.call_deferred(minimized_tabs[i])
+
+func _get_window_layout(configuration: ConfigFile):
+	var new_minimized_tabs = []
+	
+	for column in todo_screen.column_container.get_children():
+		if not column is PanelContainer:
+			continue
+		
+		new_minimized_tabs.append(column.minimized)
+	
+	configuration.set_value("SimpleTODO", "minimized_tabs", new_minimized_tabs)
+
+func _exit_tree():
+	todo_screen.undo_redo.free()
+	todo_screen.queue_free()
+
+func _make_visible(visible: bool) -> void:
+	todo_screen.visible = visible
+	set_process_input(visible)
+
+func _shortcut_input(event: InputEvent) -> void:
+	if not todo_screen.is_visible_in_tree():
+		return
+	
+	if not event.is_pressed() or event.is_echo():
+		return
+	
+	if event.is_action(&"ui_undo", true):
+		todo_screen.undo_redo.undo()
+		get_viewport().set_input_as_handled()
+	elif event.is_action(&"ui_redo", true):
+		todo_screen.undo_redo.redo()
+		get_viewport().set_input_as_handled()
+
+func save_data():
+	var image_database_updated: bool
+	var used_images: Dictionary[Image, bool]
+	
+	var data := ConfigFile.new()
+	for column in todo_screen.column_container.get_children():
+		var section = column.header.name_edit.text
+		if section.is_empty():
+			section = "__column%d__" % column.get_index()
+		
+		if column.item_container.get_child_count() == 0:
+			data.set_value(section, "__none__", "null")
+			continue
+		
+		for item in column.item_container.get_children():
+			var item_id := str("item", item.id)
+			data.set_value(section, item_id, item.text_field.text)
+			
+			var image: Image = item.image_data
+			if image:
+				if not image in image_database:
+					var id: PackedStringArray
+					for i in 8:
+						id.append(char(randi_range(33, 125)))
+					image_database[image] = "".join(id)
+					image_database_updated = true
+				
+				used_images[image] = true
+				item_id += ".image"
+				data.set_value(section, item_id, image_database[image])
+	
+	for imag in image_database.keys():
+		if not imag in used_images:
+			image_database.erase(imag)
+			image_database_updated = true
+	
+	data.save(text_data_file)
+	
+	if image_database_updated:
+		var data_to_save: Dictionary[String, PackedByteArray]
+		
+		for imag in image_database:
+			data_to_save[image_database[imag]] = imag.save_png_to_buffer()
+		
+		var image_file := FileAccess.open(image_data_file, FileAccess.WRITE)
+		image_file.store_var(data_to_save)
+
+func load_data():
+	var data := ConfigFile.new()
+	data.load(text_data_file)
+	
+	var image_data: Dictionary[String, PackedByteArray]
+	var image_dataf := FileAccess.open(image_data_file, FileAccess.READ)
+	if image_dataf:
+		var loaded = image_dataf.get_var()
+		if loaded is Dictionary:
+			image_data.assign(loaded)
+	
+	for section in data.get_sections():
+		var column = todo_screen.create_column()
+		if not section.begins_with("__column"):
+			column.ready.connect(column.set_title.bind(section))
+		pending_columns.append(column)
+		
+		for item in data.get_section_keys(section):
+			if item == "__none__" or item.ends_with(".image"):
+				continue
+			
+			var image_id = data.get_value(section, item + ".image", "")
+			var image_bytes = image_data.get(image_id)
+			var image: Image
+			
+			if image_bytes is PackedByteArray:
+				image = Image.new()
+				image.load_png_from_buffer(image_bytes)
+				image_database[image] = image_id
+			
+			var column_item = column.create_item()
+			column_item.image_data = image
+			column_item.ready.connect(column_item.initialize.bind(data.get_value(section, item), item.to_int()), CONNECT_DEFERRED)
+			column.ready.connect(column_item.add_to_column.bind(column))

@@ -21,7 +21,7 @@ func _init(beat: float, line_index: int, line_layer: int, color: int, cut_direct
 
 static func new_v2(note_dict: Dictionary) -> ColorNoteInfo:
 	return ColorNoteInfo.new(
-		Utils.get_float(note_dict, "_time", 0.0),
+		Utils.get_float(note_dict, "_time", 0.0) ,
 		int(Utils.get_float(note_dict, "_lineIndex", 0)),
 		int(Utils.get_float(note_dict, "_lineLayer", 0)),
 		int(Utils.get_float(note_dict, "_type", -1.0)),
