@@ -61,9 +61,9 @@ func _process_map(game: BeepSaber_Game) -> void:
 	var current_beat := game.song_player.get_playback_position() * (beats_per_second) 
 	var bpm:float = Map.current_info.beats_per_minute
 	var hjd:float = calcHjd(Map.current_difficulty.note_jump_start_beat_offset,bpm,njs)
-	var jd:float = njs * (60 / bpm) * hjd * 2
+	var jd:float = njs * (60 / bpm) * hjd *4
 	var rt:float = jd / (2 * njs)
-	var look_ahead := current_beat + rt*beats_per_second
+	var look_ahead := current_beat + rt*beats_per_second * 1
 	
 	#print(rt/beats_per_second," ",jd," ",njs," ",look_ahead," ",current_beat)
 	#print(look_ahead - current_beat," ",reaction_time/2," ",beat," ",current_beat," ",jump_distance)
