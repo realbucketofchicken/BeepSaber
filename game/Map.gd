@@ -14,6 +14,7 @@ static var obstacle_stack: Array[ObstacleInfo]
 static var arc_stack: Array[ArcInfo]
 static var chain_stack: Array[ChainInfo]
 static var event_stack: Array[EventInfo]
+static var animate_track_stack: Array[AnimateTrackInfo]
 
 static var color_left: Color
 static var color_right: Color
@@ -188,8 +189,82 @@ static func load_event_stack_v2(event_data: Array) -> void:
 	#event_thread_1.wait_to_finish()
 	Utils.custom_thread_wait_to_finish(event_thread_1)
 
-static func load_cutom_data_v2(custom_data: Array) -> void:
-	pass
+static func find_point_def(point_defs:Array[PointDefinition],name:StringName) -> PointDefinition:
+	for def in point_defs:
+		if def.name == name:
+			return def
+	return null
+
+static func load_cutom_data_v2(custom_data: Dictionary) -> void:
+	var point_defs_data:Array = Utils.get_array(custom_data, "_pointDefinitions", [])
+	var point_defs:Array[PointDefinition]
+	for def in point_defs_data:
+		var new_def:PointDefinition
+		new_def = NoodlePoint.create_point_from_data(def["_points"])
+		new_def.name = def["_name"]
+		point_defs.append(new_def)
+	var custom_events:Array = Utils.get_array(custom_data, "_customEvents", [])
+	var things:Array[AnimateTrackInfo]
+	for event:Dictionary in custom_events:
+		if event["_type"] != "AnimateTrack":
+			push_warning("Unsupported track type: ",event["_type"])
+			continue
+		var event_info:AnimateTrackInfo = AnimateTrackInfo.new()
+		event_info.beat = event["_time"]
+		var data = event["_data"]
+		print(data)
+		for thing in data:
+			match thing:
+				"_track":
+					if data["_track"] is String:
+						event_info.target_tracks.append(StringName(data["_track"]))
+					else:
+						event_info.target_tracks.append_array(data["_track"])
+				"_duration":
+					event_info.duration = data["_duration"]
+				"_dissolve":
+					var n_d = data["_dissolve"]
+					if n_d is String:
+						event_info.cube_dissolve = find_point_def(point_defs,StringName(n_d))
+					else:
+						event_info.cube_dissolve = NoodlePoint.create_point_from_data(n_d)
+				"_dissolveArrow":
+					var n_d = data["_dissolveArrow"]
+					if n_d is String:
+						event_info.arrow_dissolve = find_point_def(point_defs,StringName(n_d))
+					else:
+						event_info.arrow_dissolve = NoodlePoint.create_point_from_data(n_d)
+				"_scale":
+					var n_d = data["_scale"]
+					if n_d is String:
+						event_info.offset_scale = find_point_def(point_defs,StringName(n_d))
+					else:
+						event_info.offset_scale = NoodlePoint.create_point_from_data(n_d)
+				"_position":
+					var n_d = data["_position"]
+					if n_d is String:
+						event_info.offset_positions = find_point_def(point_defs,StringName(n_d))
+					else:
+						event_info.offset_positions = NoodlePoint.create_point_from_data(n_d)
+				"_localRotation": 
+					var n_d = data["_localRotation"]
+					if n_d is String:
+						event_info.offset_rotation = find_point_def(point_defs,StringName(n_d))
+					else:
+						event_info.offset_rotation = NoodlePoint.create_point_from_data(n_d)
+				"_easing":
+					event_info.default_easing = data["_easing"]
+				_:
+					push_warning("Unsupported parameter: ",thing)
+		things.append(event_info)
+	# bite me
+	animate_track_stack = things
+	animate_track_stack.sort_custom(sort_ascending)
+
+static func sort_ascending(a:AnimateTrackInfo, b:AnimateTrackInfo):
+	if a.beat > b.beat:
+		return true
+	return false
 
 static func load_note_stack_v3(note_data: Array) -> void:
 	var last_index := note_data.size() - 1
@@ -307,7 +382,7 @@ static func load_beatmap(info: MapInfo, difficulty: DifficultyInfo, map_data: Di
 	
 	if map_data.has("_version"):
 		#note_thread_0.start(load_note_stack_v2.bind(Utils.get_array(map_data, "_notes", [])))
-		load_cutom_data_v2(Utils.get_array(map_data, "_customData", []))
+		load_cutom_data_v2(Utils.get_dict(map_data, "_customData", {}))
 		Utils.custom_thread_call(note_thread_0, load_note_stack_v2, [Utils.get_array(map_data, "_notes", [])])
 		#obstacle_thread_0.start(load_obstacle_stack_v2.bind(Utils.get_array(map_data, "_obstacles", [])))
 		Utils.custom_thread_call(obstacle_thread_0, load_obstacle_stack_v2, [Utils.get_array(map_data, "_obstacles", [])])

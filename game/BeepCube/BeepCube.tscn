@@ -109,45 +109,48 @@ _data = {
 &"Spawn": SubResource("3")
 }
 
-[node name="BeepCube" type="Node3D" unique_id=1480937251 node_paths=PackedStringArray("mi", "collision_big", "collision_small", "slice_particles", "beep_cube_big", "beep_cube_small", "animation_player", "offset")]
+[node name="BeepCube" type="Node3D" unique_id=1480937251 node_paths=PackedStringArray("mi", "collision_big", "collision_small", "slice_particles", "beep_cube_big", "beep_cube_small", "animation_player", "offset", "track_offset")]
 script = ExtResource("1_7mymb")
-mi = NodePath("Offset/BeepCubeMesh/BeepCubeMesh")
-collision_big = NodePath("Offset/BeepCube_Big/CollisionBig")
-collision_small = NodePath("Offset/BeepCube_Small/CollisionSmall")
-slice_particles = NodePath("Offset/SliceParticles")
-beep_cube_big = NodePath("Offset/BeepCube_Big")
-beep_cube_small = NodePath("Offset/BeepCube_Small")
-animation_player = NodePath("Offset/AnimationPlayer")
-offset = NodePath("Offset")
+mi = NodePath("TrackOffset/Offset/BeepCubeMesh/BeepCubeMesh")
+collision_big = NodePath("TrackOffset/Offset/BeepCube_Big/CollisionBig")
+collision_small = NodePath("TrackOffset/Offset/BeepCube_Small/CollisionSmall")
+slice_particles = NodePath("TrackOffset/Offset/SliceParticles")
+beep_cube_big = NodePath("TrackOffset/Offset/BeepCube_Big")
+beep_cube_small = NodePath("TrackOffset/Offset/BeepCube_Small")
+animation_player = NodePath("TrackOffset/Offset/AnimationPlayer")
+offset = NodePath("TrackOffset/Offset")
+track_offset = NodePath("TrackOffset")
 
-[node name="Offset" type="Node3D" parent="." unique_id=1460513517]
+[node name="TrackOffset" type="Node3D" parent="." unique_id=1883861101]
 
-[node name="BeepCubeMesh" parent="Offset" unique_id=842838808 instance=ExtResource("2_sbb11")]
+[node name="Offset" type="Node3D" parent="TrackOffset" unique_id=1460513517]
+
+[node name="BeepCubeMesh" parent="TrackOffset/Offset" unique_id=842838808 instance=ExtResource("2_sbb11")]
 transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0, 0)
 
-[node name="BeepCubeMesh" parent="Offset/BeepCubeMesh" index="0" unique_id=1051909769]
+[node name="BeepCubeMesh" parent="TrackOffset/Offset/BeepCubeMesh" index="0" unique_id=1051909769]
 layers = 3
 material_override = SubResource("ShaderMaterial_x86ma")
 
-[node name="BeepCube_Big" type="Area3D" parent="Offset" unique_id=1395643966 groups=["beepcube"]]
+[node name="BeepCube_Big" type="Area3D" parent="TrackOffset/Offset" unique_id=1395643966 groups=["beepcube"]]
 monitoring = false
 
-[node name="CollisionBig" type="CollisionShape3D" parent="Offset/BeepCube_Big" unique_id=473421397]
+[node name="CollisionBig" type="CollisionShape3D" parent="TrackOffset/Offset/BeepCube_Big" unique_id=473421397]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.25)
 shape = SubResource("1")
 disabled = true
 
-[node name="BeepCube_Small" type="Area3D" parent="Offset" unique_id=1253656530 groups=["beepcube"]]
+[node name="BeepCube_Small" type="Area3D" parent="TrackOffset/Offset" unique_id=1253656530 groups=["beepcube"]]
 monitoring = false
 
-[node name="CollisionSmall" type="CollisionShape3D" parent="Offset/BeepCube_Small" unique_id=1151495483]
+[node name="CollisionSmall" type="CollisionShape3D" parent="TrackOffset/Offset/BeepCube_Small" unique_id=1151495483]
 shape = SubResource("2")
 disabled = true
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="Offset" unique_id=1568566500]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="TrackOffset/Offset" unique_id=1568566500]
 root_node = NodePath("../BeepCubeMesh")
 libraries/ = SubResource("AnimationLibrary_7xfev")
 
-[node name="SliceParticles" parent="Offset" unique_id=487635705 instance=ExtResource("5_tissj")]
+[node name="SliceParticles" parent="TrackOffset/Offset" unique_id=487635705 instance=ExtResource("5_tissj")]
 
-[editable path="Offset/BeepCubeMesh"]
+[editable path="TrackOffset/Offset/BeepCubeMesh"]

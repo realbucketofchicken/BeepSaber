@@ -28,21 +28,24 @@ var piece_right : CutPiece = null
 #####################
 # NOODLE EXTENTIONS #
 #####################
-var offset_positions_array:Array[Array]
-var offset_rotation_array:Array[Array]
-var offset_scale_array:Array[Array]
-var cube_dissolve_array:Array[Array]
-var arrow_dissolve_array:Array[Array]
+var offset_positions_d:PointDefinition
+var definite_positions_d:PointDefinition
+var offset_rotation_d:PointDefinition
+var offset_scale_d:PointDefinition
+var cube_dissolve_d:PointDefinition
+var arrow_dissolve_d:PointDefinition
 var tracks:Array[StringName]
 var is_fake:bool
 var interactible:bool
 var disable_spawn_effect:bool
 var position_offset:Vector3
 @export var offset: Node3D
+@export var track_offset: Node3D
 var start_z:float
 var dissolve:float
 var arrow_dissolve:float
-
+var time:float
+var start_pos:Vector3
 
 
 func _ready() -> void:
@@ -73,6 +76,9 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 	offset.position = Vector3.ZERO
 	offset.scale = Vector3.ONE
 	offset.rotation = Vector3.ZERO
+	track_offset.position = Vector3.ZERO
+	track_offset.scale = Vector3.ONE
+	track_offset.rotation = Vector3.ZERO
 	if noteLineIndex >= 1000 or noteLineIndex <= -1000:
 		if sign(note_info.line_index) == 1:
 			transform.origin.x = ((note_info.line_index / 1000.0) - 2.5)
@@ -83,8 +89,6 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 		transform.origin.x = (note_info.line_index * 0.6) + Constants.LANE_ZERO_X
 		transform.origin.y = (note_info.line_layer * 0.6 ) + Constants.LAYER_ZERO_Y
 
-	transform.origin.z = -jd
-	start_z = -jd
 	
 	if note_info.cut_direction < 9:
 		rotation.z = Constants.CUBE_ROTATIONS[note_info.cut_direction] + deg_to_rad(note_info.angle_offset)
@@ -96,99 +100,72 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 	else:
 		(collision_big.shape as BoxShape3D).size.y = 0.5
 	
-	offset_positions_array = []
-	offset_rotation_array = []
-	offset_scale_array = []
-	cube_dissolve_array = []
-	arrow_dissolve_array = []
+	offset_positions_d = null
+	offset_rotation_d = null
+	offset_scale_d = null
+	cube_dissolve_d = null
+	arrow_dissolve_d = null
+	definite_positions_d = null
 	dissolve = 1.0
 	arrow_dissolve = 1.0
 	interactible = true
 	is_fake = false
 	tracks = []
-	if note_info.custom_data.has("_position"):
-		var pos:Array = note_info.custom_data["_position"]
-		transform.origin = Vector3(pos[0]* 0.6,(pos[1]* 0.6) + Constants.LAYER_ZERO_Y,transform.origin.z)
-	if note_info.custom_data.has("_scale"):
-		var scales:Array = note_info.custom_data["_scale"]
-		offset.scale = Vector3(scales[0],scales[1],scales[2])
-		offset.scale = offset.scale.max(Vector3.ONE*0.001)
-	if note_info.custom_data.has("_cutDirection"):
-		rotation_degrees.z = note_info.custom_data["_cutDirection"]
 	is_fake = false
-	if note_info.custom_data.has("_fake"):
-		is_fake = note_info.custom_data["_fake"]
 	interactible = true
-	if note_info.custom_data.has("_interactable"):
-		interactible = note_info.custom_data["_interactable"]
-		print("INTERACT: ", interactible)
 	disable_spawn_effect = false
-	if note_info.custom_data.has("_disableSpawnEffect"):
-		if note_info.custom_data["_disableSpawnEffect"] is String:
-			disable_spawn_effect = note_info.custom_data["_disableSpawnEffect"] == "true"
-		else:
-			disable_spawn_effect = note_info.custom_data["_disableSpawnEffect"]
-	# i SHOULD put this is a different class...
-	# :3
-	if note_info.custom_data.has("_animation"):
-		for property in note_info.custom_data["_animation"]:
-			#print(property)
-			match property:
-				"_position":
-					var positions:Array = note_info.custom_data["_animation"]["_position"]
-					#print(positions)
-					if positions.size() == 1:
-						var pos:Vector3 = Vector3(positions[0][0],positions[0][1],positions[0][2])
-						offset_positions_array = [[pos]]
-						break
-					for arr:Array in positions:
-						var pos:Vector3 = Vector3(arr[0],arr[1],arr[2])
-						var sub_info_array = [pos,arr[3],InterpolationHelper.Easings.get_easing_type(arr.get(4)) if arr.size() == 5 else -1]
-						offset_positions_array.append(sub_info_array)
-				"_rotation":
-					var rotations:Array = note_info.custom_data["_animation"]["_rotation"]
-					#print(rotations)
-					if rotations.size() == 1:
-						var rot:Vector3 = Vector3(rotations[0][0],rotations[0][1],rotations[0][2])
-						offset_rotation_array = [[rot]]
-						break
-					for arr:Array in rotations:
-						var rot:Vector3 = Vector3(arr[0],arr[1],arr[2])
-						var sub_info_array = [rot,arr[3],InterpolationHelper.Easings.get_easing_type(arr.get(4)) if arr.size() == 5 else -1]
-						offset_rotation_array.append(sub_info_array)
-				"_scale":
-					var scales:Array = note_info.custom_data["_animation"]["_scale"]
-					#print(scales)
-					if scales.size() == 1:
-						var scl:Vector3 = Vector3(scales[0][0],scales[0][1],scales[0][2])
-						offset_scale_array = [[scl]]
-						break
-					for arr:Array in scales:
-						var scl:Vector3 = Vector3(arr[0],arr[1],arr[2])
-						var sub_info_array = [scl,arr[3],InterpolationHelper.Easings.get_easing_type(arr.get(4)) if arr.size() == 5 else -1]
-						offset_scale_array.append(sub_info_array)
-				"_dissolve":
-					var dissolves:Array = note_info.custom_data["_animation"]["_dissolve"]
-					#print(dissolves)
-					if dissolves.size() == 1:
-						cube_dissolve_array = [[dissolves[0][0]]]
-						#cube_dissolve_array = dissolves
-						break
-					for arr:Array in dissolves:
-						var dissolve:float = arr[0]
-						var sub_info_array = [dissolve,arr[1],InterpolationHelper.Easings.get_easing_type(arr.get(2))if arr.size() == 3 else -1]
-						cube_dissolve_array.append(sub_info_array)
-				"_dissolveArrow":
-					var dissolves:Array = note_info.custom_data["_animation"]["_dissolveArrow"]
-					#print(dissolves)
-					if dissolves.size() == 1:
-						arrow_dissolve_array = [[dissolves[0][0]]]
-						break
-					for arr:Array in dissolves:
-						var loc_dissolve:float = arr[0]
-						var sub_info_array = [loc_dissolve,arr[1],InterpolationHelper.Easings.get_easing_type(arr.get(2)) if arr.size() == 3 else -1]
-						arrow_dissolve_array.append(sub_info_array)
+	for dat in note_info.custom_data:
+		match dat:
+			"_position":
+				var pos:Array = note_info.custom_data["_position"]
+				transform.origin = Vector3(pos[0]* 0.6,(pos[1]* 0.6) + Constants.LAYER_ZERO_Y,transform.origin.z)
+			"_scale":
+				var scales:Array = note_info.custom_data["_scale"]
+				offset.scale = Vector3(scales[0],scales[1],scales[2])
+				offset.scale = offset.scale.max(Vector3.ONE*0.001)
+			"_cutDirection":
+				rotation_degrees.z = note_info.custom_data["_cutDirection"]
+			"_fake":
+				is_fake = note_info.custom_data["_fake"]
+			"_interactable":
+				interactible = note_info.custom_data["_interactable"]
+			"_disableSpawnEffect":
+				if note_info.custom_data["_disableSpawnEffect"] is String:
+					disable_spawn_effect = note_info.custom_data["_disableSpawnEffect"] == "true" # why
+				else:
+					disable_spawn_effect = note_info.custom_data["_disableSpawnEffect"]
 	
+			"_noteJumpMovementSpeed":
+				njs = note_info.custom_data["_noteJumpMovementSpeed"]
+			"_animation":
+				for property in note_info.custom_data["_animation"]:
+					match property:
+						"_dissolve":
+							var n_d = note_info.custom_data["_animation"]["_dissolve"]
+							cube_dissolve_d = NoodlePoint.create_point_from_data(n_d)
+						"_dissolveArrow":
+							var n_d = note_info.custom_data["_animation"]["_dissolveArrow"]
+							arrow_dissolve_d = NoodlePoint.create_point_from_data(n_d)
+						"_scale":
+							var n_d = note_info.custom_data["_animation"]["_scale"]
+							offset_scale_d = NoodlePoint.create_point_from_data(n_d)
+						"_position":
+							var n_d = note_info.custom_data["_animation"]["_position"]
+							offset_positions_d = NoodlePoint.create_point_from_data(n_d)
+						"_rotation":
+							var n_d = note_info.custom_data["_animation"]["_rotation"]
+							offset_rotation_d = NoodlePoint.create_point_from_data(n_d)
+						"_definitePosition":
+							var n_d = note_info.custom_data["_animation"]["_definitePosition"]
+							definite_positions_d = NoodlePoint.create_point_from_data(n_d)
+						_:
+							push_warning("Unsupported parameter: ",property)
+			"_track":
+				pass
+			"_color":
+				pass
+			_:
+				push_warning("Unsupported parameter: ",dat)
 	piece_left.set_color(color)
 	piece_right.set_color(color)
 	_mat.set_shader_parameter(&"color", color)
@@ -219,43 +196,27 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 	
 	slice_particles.reset()
 	mi.visible = true
+	transform.origin.z = -jd
+	start_z = -jd
+	start_pos = global_position
 
 func _physics_process(delta: float) -> void:
 	super(delta)
-	var current_progress:float
-	current_progress = -transform.origin.z/start_z
-	if !offset_positions_array.is_empty():
-		if offset_positions_array.size() == 1:
-			offset.position = offset_positions_array[0][0]
-		else:
-			offset.position = InterpolationHelper.get_animation(offset_positions_array,current_progress)
-	if !offset_rotation_array.is_empty():
-		if offset_rotation_array.size() == 1:
-			offset.rotation = offset_rotation_array[0][0]
-		else:
-			offset.rotation = InterpolationHelper.get_animation_rotations(offset_rotation_array,current_progress)
-	if !offset_scale_array.is_empty():
-		if offset_scale_array.size() == 1:
-			offset.scale = offset_scale_array[0][0]
-			offset.scale = offset.scale.max(Vector3.ONE*0.001)
-		else:
-			offset.scale = InterpolationHelper.get_animation(offset_scale_array,current_progress)
-			offset.scale = offset.scale.max(Vector3.ONE*0.001)
-	if !cube_dissolve_array.is_empty():
-		if cube_dissolve_array.size() == 1:
-			#print(cube_dissolve_array)
-			if cube_dissolve_array[0].size() == 1:
-				dissolve = cube_dissolve_array[0][0]
-		else:
-			dissolve = InterpolationHelper.get_animation(cube_dissolve_array,current_progress)
-	if !arrow_dissolve_array.is_empty():
-		if arrow_dissolve_array.size() == 1:
-			#print(arrow_dissolve_array)
-			if arrow_dissolve_array[0].size() == 1:
-				arrow_dissolve = arrow_dissolve_array[0][0]
-		else:
-			arrow_dissolve = InterpolationHelper.get_animation(arrow_dissolve_array,current_progress)
-	
+	time = -transform.origin.z/start_z
+	if offset_positions_d != null:
+		offset.position = InterpolationHelper.get_animation(offset_positions_d,time)
+	if offset_rotation_d != null:
+		offset.rotation_degrees = InterpolationHelper.get_animation(offset_rotation_d,time)
+	if offset_scale_d != null:
+		offset.scale = InterpolationHelper.get_animation(offset_scale_d,time)
+		offset.scale = offset.scale.max(Vector3.ONE*0.001)
+	if cube_dissolve_d != null:
+		dissolve = InterpolationHelper.get_animation(cube_dissolve_d,time)
+	if arrow_dissolve_d != null:
+		arrow_dissolve = InterpolationHelper.get_animation(arrow_dissolve_d,time)
+	if definite_positions_d != null:
+		offset.global_position = start_pos + InterpolationHelper.get_animation(definite_positions_d,time)*0.6
+		offset.global_position.z = InterpolationHelper.get_animation(definite_positions_d,time).z *0.6
 	
 	_mat.set_shader_parameter(&"dissolve", 1.0-dissolve)
 	_mat.set_shader_parameter(&"arrow_dissolve", 1.0-arrow_dissolve)
@@ -293,7 +254,7 @@ func set_collision_disabled(value: bool) -> void:
 
 func cut(saber_type: int, cut_speed: Vector3, cut_plane: Plane, controller: BeepSaberController,area:Area3D) -> void:
 	if !interactible:
-		print("NOT INTERACTIBLE")
+		#print("NOT INTERACTIBLE")
 		return
 	# compute the angle between the cube orientation and the cut direction
 	var cut_direction_xy := -Vector3(cut_speed.x, cut_speed.y, 0.0).normalized()
@@ -302,7 +263,7 @@ func cut(saber_type: int, cut_speed: Vector3, cut_plane: Plane, controller: Beep
 	
 	if saber_type == which_saber:
 		if base_cut_angle_accuracy < 0.75 && !is_dot:
-			print(collision_small.get_parent(), " ", area)
+			#print(collision_small.get_parent(), " ", area)
 			if area == collision_small.get_parent():
 				if !is_fake:
 					Scoreboard.bad_cut(transform.origin)

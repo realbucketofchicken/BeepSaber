@@ -2,25 +2,24 @@ class_name InterpolationHelper extends RefCounted
 
 
 # this is cursed
-static func get_animation(arrays:Array[Array],time:float) -> Variant:
+static func get_animation(arrays:PointDefinition,time:float, default_easing:InterpolationHelper.Easings.easing_types = InterpolationHelper.Easings.easing_types.none) -> Variant:
 	# [[Vector3,time,easing],[Vector3,time,easing],[Vector3,time,easing]]
-	if arrays[0][1] > time:
-		return arrays[0][0]
-	elif arrays[-1][1] < time:
-		return arrays[-1][0]
+	if arrays.points_array[0].time > time:
+		return arrays.points_array[0].data_point
+	elif arrays.points_array[-1].time < time:
+		return arrays.points_array[-1].data_point
 	#                                        \/ watch this be an off-by-one error
-	for cur_inbetween in range(arrays.size()-1):
-		var from_array:Array = arrays[cur_inbetween]
-		print(from_array)
-		var to_array:Array = arrays[cur_inbetween+1]
-		print(to_array)
-		if from_array[1] < time && to_array[1] > time:
+	for cur_inbetween in range(arrays.points_array.size()-1):
+		var from_def:NoodlePoint = arrays.points_array[cur_inbetween]
+		#print(from_def)
+		var to_def:NoodlePoint = arrays.points_array[cur_inbetween+1]
+		#print(to_def)
+		if from_def.time < time && to_def.time > time:
 			var easing:int = -1
-			if to_array.size() > 2:
-				easing = Easings.get_easing_type(to_array[2])
+			easing = Easings.get_easing_type(from_def.easing if from_def.easing != InterpolationHelper.Easings.easing_types.none else default_easing)
 			var interpolate:float = Easings.get_ease(time,easing)
-			return lerp(from_array[0],to_array[0],interpolate)
-	return arrays[0][0]
+			return lerp(from_def.data_point,to_def.data_point,interpolate)
+	return arrays.points_array[0].data_point
 
 ## returns in euler angles, but interpolates with basis
 static func get_animation_rotations(arrays:Array[Array],time:float) -> Variant:
@@ -32,9 +31,9 @@ static func get_animation_rotations(arrays:Array[Array],time:float) -> Variant:
 	#                                        \/ watch this be an off-by-one error
 	for cur_inbetween in range(arrays.size()-1):
 		var from_array:Array = arrays[cur_inbetween]
-		print(from_array)
+		#print(from_array)
 		var to_array:Array = arrays[cur_inbetween+1]
-		print(to_array)
+		#print(to_array)
 		if from_array[1] < time && to_array[1] > time:
 			var easing:int = -1
 			if arrays[cur_inbetween+1].size() > 2:
@@ -48,6 +47,7 @@ static func get_animation_rotations(arrays:Array[Array],time:float) -> Variant:
 
 class Easings:
 	enum easing_types{
+		none,
 		easeInSine,
 		easeOutSine,
 		easeInOutSine,
@@ -71,6 +71,12 @@ class Easings:
 		easeInExpo,
 		easeOutExpo,
 		easeInOutExpo,
+		easeInBack,
+		easeOutBack,
+		easeInOutBack,
+		easeInBounce,
+		easeOutBounce,
+		easeInOutBounce,
 	}
 	
 	# thank GOD godot supports multi cursors
@@ -122,18 +128,33 @@ class Easings:
 				return easeOutExpo(time)
 			easing_types.easeInOutExpo:
 				return easeInOutExpo(time)
+			easing_types.easeInBack:
+				return easeInBack(time)
+			easing_types.easeOutBack:
+				return easeOutBack(time)
+			easing_types.easeInOutBack:
+				return easeInOutBack(time)
+			easing_types.easeInBounce:
+				return easeInBounce(time)
+			easing_types.easeOutBounce:
+				return easeOutBounce(time)
+			easing_types.easeInOutBounce:
+				return easeInOutBounce(time)
+			easing_types.none:
+				return lerpf(0,1,time)
 			_:
+				push_error("MISSING INTERPOLATION")
 				return lerpf(0,1,time)
 	
 	## not sure this is the best most optimized
-	static func get_easing_type(source) -> int:
+	static func get_easing_type(source:Variant) -> int:
 		if source is not String:
-			return -1
+			return easing_types.none
 		if easing_types.has(source):
 			return easing_types[source]
 		else:
 			push_error("MISSING EASING: ",source)
-			return -1
+			return easing_types.none
 
 
 	static func easeInSine(x: float) -> float:
@@ -259,3 +280,42 @@ class Easings:
 
 	static func easeInOutBounce(x: float) -> float:
 		return (1 - easeOutBounce(1 - 2 * x)) / 2 if x < 0.5 else (1 + easeOutBounce(2 * x - 1)) / 2;
+	
+func easeInBack(x: float) -> float:
+	const c1 = 1.70158;
+	const c3 = c1 + 1;
+
+	return c3 * x * x * x - c1 * x * x;
+
+func easeOutBack(x: float) -> float:
+	const c1 = 1.70158;
+	const c3 = c1 + 1;
+
+	return 1 + c3 * pow(x - 1, 3) + c1 * pow(x - 1, 2);
+
+func easeInOutBack(x: float) -> float:
+	const c1 = 1.70158;
+	const c2 = c1 * 1.525;
+
+	return (pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2 if x < 0.5 else\
+	  (pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2
+
+func easeInBounce(x: float) -> float:
+	return 1 - easeOutBounce(1 - x);
+
+func easeOutBounce(x: float) -> float:
+	const n1 = 7.5625;
+	const d1 = 2.75;
+
+	if (x < 1 / d1):
+		return n1 * x * x;
+	elif (x < 2 / d1):
+		return n1 * (x - 1.5 / d1) * x + 0.75;
+	elif (x < 2.5 / d1):
+		return n1 * (x - 2.25 / d1) * x + 0.9375;
+	else:
+		return n1 * (x - 2.625 / d1) * x + 0.984375;
+	
+
+func easeInOutBounce(x: float) -> float:
+	return (1 - easeOutBounce(1 - 2 * x)) / 2 if x < 0.5 else (1 + easeOutBounce(2 * x - 1)) / 2;

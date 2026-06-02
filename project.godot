@@ -144,8 +144,7 @@ ui_end={
 
 common/physics_ticks_per_second=144
 common/physics_jitter_fix=0.0
-3d/physics_engine="Bullet"
-common/physics_fps=72
+3d/physics_engine="Jolt Physics"
 
 [rendering]
 

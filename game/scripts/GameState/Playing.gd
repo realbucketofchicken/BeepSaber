@@ -39,6 +39,7 @@ var arc_template := load("res://game/Arc/Arc.tscn") as PackedScene
 const BEATS_AHEAD := 4.0
 
 var track_map:Dictionary[StringName,Array]
+var tracks:Array[AnimateTrackInfo]
 
 func calcHjd(offset: float,bpm:float,njs:float) -> float:
 	var maxHalfJump := 17.999;
@@ -64,7 +65,7 @@ func _process_map(game: BeepSaber_Game) -> void:
 	var jd:float = njs * (60 / bpm) * hjd *2
 	var rt:float = jd / (2 * njs)
 	var look_ahead := current_beat + rt*beats_per_second*2
-	print(rt/beats_per_second," ",jd," ",njs," ",look_ahead," ",current_beat)
+	#print(rt/beats_per_second," ",jd," ",njs," ",look_ahead," ",current_beat)
 	#print(look_ahead - current_beat," ",reaction_time/2," ",beat," ",current_beat," ",jump_distance)
 	
 	# chains connect to a regular colornote and modify it, so we have to keep
@@ -87,7 +88,11 @@ func _process_map(game: BeepSaber_Game) -> void:
 		else:
 			note.spawn(note_info, current_beat, color,njs,jd)
 		if note_info.custom_data.has("_track"):
-			var found_tracks:Array
+			var found_tracks:Array 
+			if note_info.custom_data["_track"] is String:
+				found_tracks = [note_info.custom_data["_track"]]
+			else:
+				found_tracks = note_info.custom_data["_track"]
 			for track in found_tracks:
 				if track_map.has(track):
 					track_map[track].append(note)
@@ -140,4 +145,33 @@ func _process_map(game: BeepSaber_Game) -> void:
 	while not Map.event_stack.is_empty() and Map.event_stack[-1].beat <= current_beat:
 		game.event_driver.process_event(Map.event_stack.pop_back() as EventInfo)
 	
+	while not Map.animate_track_stack.is_empty() and Map.animate_track_stack[-1].beat <= current_beat:
+		print("track spawned")
+		tracks.append(Map.animate_track_stack.pop_back() as AnimateTrackInfo)
 	
+	for track in tracks:
+		var track_progress:float = (current_beat-track.beat)/track.duration
+		if track_progress >= 1:
+			tracks.erase(track)
+			continue
+		var objects:Array[Node3D]
+		for track_name in track.target_tracks:
+			if track_map.has(track_name):
+				objects.append_array(track_map[track_name])
+		for object in objects:
+			var track_offset:Node3D
+			if object is not BeepCube:
+				push_error("unsupported type, please implement")
+				continue
+			var cube:BeepCube = object
+			if track.offset_positions != null:
+				cube.track_offset.position = InterpolationHelper.get_animation(track.offset_positions,track_progress,track.default_easing)
+			if track.offset_rotation != null:
+				cube.track_offset.rotation_degrees = InterpolationHelper.get_animation(track.offset_rotation,track_progress,track.default_easing)
+			if track.offset_scale != null:
+				cube.track_offset.scale = InterpolationHelper.get_animation(track.offset_scale,track_progress,track.default_easing)
+				cube.track_offset.scale = cube.track_offset.scale.max(Vector3.ONE*0.001)
+			if track.cube_dissolve != null:
+				cube.dissolve = InterpolationHelper.get_animation(track.cube_dissolve,track_progress,track.default_easing)
+			if track.arrow_dissolve != null:
+				cube.arrow_dissolve = InterpolationHelper.get_animation(track.arrow_dissolve,track_progress,track.default_easing)
