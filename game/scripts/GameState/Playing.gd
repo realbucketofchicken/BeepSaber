@@ -150,7 +150,7 @@ func _process_map(game: BeepSaber_Game) -> void:
 	
 	for track in tracks:
 		var track_progress:float = (current_beat-track.beat)/track.duration
-		if track_progress >= 1:
+		if track_progress >= 1.0:
 			tracks.erase(track)
 			continue
 		var objects:Array[Node3D]

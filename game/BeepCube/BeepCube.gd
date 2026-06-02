@@ -198,8 +198,7 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 	var anim_speed := Map.current_difficulty.note_jump_movement_speed / 9.0
 	animation_player.speed_scale = maxf(min_speed,anim_speed)
 	if !disable_spawn_effect:
-		pass
-		#animation_player.play(&"Spawn")
+		animation_player.play(&"Spawn")
 	
 	slice_particles.reset()
 	mi.visible = true
@@ -243,7 +242,7 @@ func _physics_process(delta: float) -> void:
 		var one:Vector3 = new_transform.origin.normalized().cross(start_trans.origin.normalized())
 		var angle:float = new_transform.origin.normalized().angle_to(start_trans.origin.normalized())
 		new_transform = new_transform.rotated(one,angle)
-		new_transform.origin *= (1.0-((time / (jd/2/njs))-0.5))
+		new_transform.origin *= ((time / (jd/njs))-0.5)/2
 		transform = new_transform
 	
 	_mat.set_shader_parameter(&"dissolve", 1.0-dissolve)

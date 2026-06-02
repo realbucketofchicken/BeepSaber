@@ -20,7 +20,7 @@ static func get_animation(arrays:PointDefinition,time:float, default_easing:Inte
 		if from_def.time < time && to_def.time > time:
 			var easing:int = -1
 			easing = Easings.get_easing_type(from_def.easing if from_def.easing != InterpolationHelper.Easings.easing_types.none else default_easing)
-			var interpolate:float = Easings.get_ease(time,easing)
+			var interpolate:float = Easings.get_ease(remap(time,from_def.time,to_def.time,0,1),easing)
 			return lerp(from_def.data_point,to_def.data_point,interpolate)
 	return arrays.points_array[0].data_point
 
@@ -41,7 +41,7 @@ static func get_animation_rotations(arrays:Array[Array],time:float) -> Variant:
 			var easing:int = -1
 			if arrays[cur_inbetween+1].size() > 2:
 				easing = Easings.get_easing_type(to_array[2])
-			var interpolate:float = Easings.get_ease(time,easing)
+			var interpolate:float = Easings.get_ease(remap(time,from_array[1],to_array[1],0,1),easing)
 			var from_basis:Basis = Basis.from_euler(from_array[0])
 			var to_basis:Basis = Basis.from_euler(to_array[0])
 			var new_basis:Basis = lerp(from_basis,to_basis,interpolate)
