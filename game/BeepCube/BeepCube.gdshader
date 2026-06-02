@@ -3,7 +3,7 @@ render_mode cull_disabled,diffuse_burley,specular_schlick_ggx;
 
 uniform vec4 color : source_color;
 uniform sampler2D texture_emission : hint_default_black;
-uniform sampler2D dissolve_texture;
+global uniform sampler2D dissolve_texture;
 
 uniform float dissolve;
 uniform float dissolve_white_offset = 0.155;

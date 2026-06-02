@@ -6,24 +6,12 @@
 [ext_resource type="Texture2D" uid="uid://drc5tdiltfqnk" path="res://game/BeepCube/BeepCubeEmission.png" id="4_10m2m"]
 [ext_resource type="PackedScene" uid="uid://cplhsipk6vhem" path="res://game/BeepCube/BeepCube_SliceParticles.tscn" id="5_tissj"]
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_7qxyk"]
-seed = 18
-frequency = 0.0053
-fractal_octaves = 1
-domain_warp_enabled = true
-domain_warp_amplitude = 44.57
-domain_warp_frequency = 0.01
-
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_x86ma"]
-noise = SubResource("FastNoiseLite_7qxyk")
-
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_x86ma"]
 resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("3_7slj3")
 shader_parameter/color = Color(1, 1, 1, 1)
 shader_parameter/texture_emission = ExtResource("4_10m2m")
-shader_parameter/dissolve_texture = SubResource("NoiseTexture2D_x86ma")
 shader_parameter/dissolve = 0.0
 shader_parameter/dissolve_white_offset = 0.155
 shader_parameter/arrow_dissolve = 0.0
@@ -135,7 +123,7 @@ track_offset = NodePath("TrackOffset")
 [node name="BeepCubeMesh" parent="TrackOffset/Offset" unique_id=842838808 instance=ExtResource("2_sbb11")]
 transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0, 0)
 
-[node name="BeepCubeMesh" parent="TrackOffset/Offset/BeepCubeMesh" index="0" unique_id=1051909769]
+[node name="BeepCubeMesh" parent="TrackOffset/Offset/BeepCubeMesh" index="0" unique_id=550977128]
 layers = 3
 material_override = SubResource("ShaderMaterial_x86ma")
 

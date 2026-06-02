@@ -1,0 +1,12 @@
+[gd_resource type="NoiseTexture2D" format=3 uid="uid://bpebkha0uwkeh"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_5xkfv"]
+seed = 18
+frequency = 0.0051
+fractal_octaves = 1
+domain_warp_enabled = true
+domain_warp_amplitude = 40.0
+domain_warp_frequency = 0.01
+
+[resource]
+noise = SubResource("FastNoiseLite_5xkfv")

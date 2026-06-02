@@ -145,9 +145,11 @@ ui_end={
 common/physics_ticks_per_second=144
 common/physics_jitter_fix=0.0
 3d/physics_engine="Jolt Physics"
+common/physics_fps=72
 
 [rendering]
 
+renderer/rendering_method="mobile"
 textures/vram_compression/import_etc2_astc=true
 shading/overrides/force_lambert_over_burley=true
 anti_aliasing/quality/msaa_3d=1
@@ -177,6 +179,19 @@ right_saber={
 "type": "vec3",
 "value": Vector3(0.5, 0, 0)
 }
+dissolve_texture={
+"type": "sampler2D",
+"value": "res://game/BeepCube/dissolvetexture.tres"
+}
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_7qxyk"]
+
+seed=18
+frequency=0.0053
+fractal_octaves=1
+domain_warp_enabled=true
+domain_warp_amplitude=44.57
+domain_warp_frequency=0.01
 
 [xr]
 
