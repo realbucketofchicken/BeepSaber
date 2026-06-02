@@ -77,6 +77,7 @@ class Easings:
 		easeInBounce,
 		easeOutBounce,
 		easeInOutBounce,
+		easeStep,
 	}
 	
 	# thank GOD godot supports multi cursors
@@ -140,6 +141,8 @@ class Easings:
 				return easeOutBounce(time)
 			easing_types.easeInOutBounce:
 				return easeInOutBounce(time)
+			easing_types.easeStep:
+				return easeStep(time)
 			easing_types.none:
 				return lerpf(0,1,time)
 			_:
@@ -197,18 +200,18 @@ class Easings:
 	static func easeInElastic(x: float) -> float:
 		const c4 = (2 * PI) / 3;
 
-		return 0 if x == 0 else 1 if x == 1 else -pow(2, 10 * x - 10) * sin((x * 10 - 10.75) * c4);
+		return 0.0 if x == 0 else 1.0 if x == 1 else -pow(2, 10 * x - 10) * sin((x * 10 - 10.75) * c4);
 
 	static func easeOutElastic(x: float) -> float:
 		const c4 = (2 * PI) / 3;
 
-		return 0 if x == 0 else 1 if x == 1 else pow(2, -10 * x) * sin((x * 10 - 0.75) * c4) + 1;
+		return 0.0 if x == 0 else 1.0 if x == 1 else pow(2, -10 * x) * sin((x * 10 - 0.75) * c4) + 1;
 
 	static func easeInOutElastic(x: float) -> float:
 		const c5 = (2 * PI) / 4.5;
 
-		return 0\
-			if x == 0 else  1\
+		return 0.0\
+			if x == 0 else  1.0\
 			if x == 1 else -(pow(2, 20 * x - 10) * sin((20 * x - 11.125) * c5)) / 2\
 			if x < 0.5 else (pow(2, -20 * x + 10) * sin((20 * x - 11.125) * c5)) / 2 + 1
 	
@@ -231,13 +234,13 @@ class Easings:
 		return 8 * x * x * x * x if x < 0.5 else 1 - pow(-2 * x + 2, 4) / 2;
 
 	static func easeInExpo(x: float) -> float:
-		return 0 if x == 0 else pow(2, 10 * x - 10);
+		return 0.0 if x == 0.0 else pow(2, 10 * x - 10);
 
 	static func easeOutExpo(x: float) -> float:
-		return 1 if x == 1 else 1 - pow(2, -10 * x);
+		return 1.0 if x == 1.0 else 1.0 - pow(2, -10 * x);
 
 	static func easeInOutExpo(x: float) -> float:
-		return 0 if x == 0 else 1\
+		return 0.0 if x == 0.0 else 1.0\
 		 if x == 1 else pow(2, 20 * x - 10) / 2\
 		 if x < 0.5 else (2 - pow(2, -20 * x + 10)) / 2;
 
@@ -281,41 +284,6 @@ class Easings:
 	static func easeInOutBounce(x: float) -> float:
 		return (1 - easeOutBounce(1 - 2 * x)) / 2 if x < 0.5 else (1 + easeOutBounce(2 * x - 1)) / 2;
 	
-func easeInBack(x: float) -> float:
-	const c1 = 1.70158;
-	const c3 = c1 + 1;
-
-	return c3 * x * x * x - c1 * x * x;
-
-func easeOutBack(x: float) -> float:
-	const c1 = 1.70158;
-	const c3 = c1 + 1;
-
-	return 1 + c3 * pow(x - 1, 3) + c1 * pow(x - 1, 2);
-
-func easeInOutBack(x: float) -> float:
-	const c1 = 1.70158;
-	const c2 = c1 * 1.525;
-
-	return (pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2 if x < 0.5 else\
-	  (pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2
-
-func easeInBounce(x: float) -> float:
-	return 1 - easeOutBounce(1 - x);
-
-func easeOutBounce(x: float) -> float:
-	const n1 = 7.5625;
-	const d1 = 2.75;
-
-	if (x < 1 / d1):
-		return n1 * x * x;
-	elif (x < 2 / d1):
-		return n1 * (x - 1.5 / d1) * x + 0.75;
-	elif (x < 2.5 / d1):
-		return n1 * (x - 2.25 / d1) * x + 0.9375;
-	else:
-		return n1 * (x - 2.625 / d1) * x + 0.984375;
-	
-
-func easeInOutBounce(x: float) -> float:
-	return (1 - easeOutBounce(1 - 2 * x)) / 2 if x < 0.5 else (1 + easeOutBounce(2 * x - 1)) / 2;
+	# NOTE: i have no fucking clue if this is how noodle extentions implements is
+	static func easeStep(_x: float) -> float:
+		return 1

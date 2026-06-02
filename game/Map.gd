@@ -255,13 +255,13 @@ static func load_cutom_data_v2(custom_data: Dictionary) -> void:
 				"_easing":
 					event_info.default_easing = data["_easing"]
 				_:
-					push_warning("Unsupported parameter: ",thing)
+					push_warning("Unsupported parameter: ",thing,": -- ",data[thing])
 		things.append(event_info)
 	# bite me
 	animate_track_stack = things
 	animate_track_stack.sort_custom(sort_ascending)
 
-static func sort_ascending(a:AnimateTrackInfo, b:AnimateTrackInfo):
+static func sort_ascending(a:AnimateTrackInfo, b:AnimateTrackInfo) -> bool:
 	if a.beat > b.beat:
 		return true
 	return false

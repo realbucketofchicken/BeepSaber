@@ -74,7 +74,10 @@ func _process_map(game: BeepSaber_Game) -> void:
 	# why did they do this?
 	var note_info_refs: Array[ColorNoteInfo] = []
 	var cube_refs: Array[BeepCube] = []
-	
+	print("gup: ",track_map.keys().size())
+	for track in track_map.keys():
+		if track_map[track].size() != 0:
+			print(track_map[track].size())
 	# spawn notes
 	while not Map.note_stack.is_empty() and Map.note_stack[-1].beat <= look_ahead:
 		var note := GlobalReferences.cube_pool.acquire() as BeepCube
