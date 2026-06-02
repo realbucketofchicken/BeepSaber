@@ -4,6 +4,9 @@ class_name InterpolationHelper extends RefCounted
 # this is cursed
 static func get_animation(arrays:PointDefinition,time:float, default_easing:InterpolationHelper.Easings.easing_types = InterpolationHelper.Easings.easing_types.none) -> Variant:
 	# [[Vector3,time,easing],[Vector3,time,easing],[Vector3,time,easing]]
+	if !arrays.points_array:
+		push_error("empty ass point definition bruh")
+		return
 	if arrays.points_array[0].time > time:
 		return arrays.points_array[0].data_point
 	elif arrays.points_array[-1].time < time:
@@ -143,7 +146,7 @@ class Easings:
 				return easeInOutBounce(time)
 			easing_types.easeStep:
 				return easeStep(time)
-			easing_types.none:
+			easing_types.none: # aka "linear"
 				return lerpf(0,1,time)
 			_:
 				push_error("MISSING INTERPOLATION")
@@ -268,22 +271,25 @@ class Easings:
 	static func easeInBounce(x: float) -> float:
 		return 1 - easeOutBounce(1 - x);
 
-	static func easeOutBounce(x: float) -> float:
-		const n1 = 7.5625;
-		const d1 = 2.75;
+	static func easeOutBounce(p: float) -> float:
+		var a:float = (121 / 16) * p * p
+		var x:float = a
 
-		if (x < 1 / d1):
-			return n1 * x * x;
-		elif (x < 2 / d1):
-			return n1 * (x - 1.5 / d1) * x + 0.75;
-		elif (x < 2.5 / d1):
-			return n1 * (x - 2.25 / d1) * x + 0.9375;
-		else:
-			return n1 * (x - 2.625 / d1) * x + 0.984375;
+		var q1:float = p - (6 / 11)
+		var b:float = ((363 / 40) * q1 * q1) + (7 / 10)
+		x =  b if (b < x) else x
+
+		var q2:float = p - (179 / 220)
+		var c:float = ((4356 / 361) * q2 * q2) + (91 / 100)
+		x = c if (c < x) else x
+
+		var q3:float = p - (19 / 20)
+		var d:float = ((54 / 5) * q3 * q3) + (973 / 1000)
+		x = d if (d < x) else x
+		return x;
 
 	static func easeInOutBounce(x: float) -> float:
 		return (1 - easeOutBounce(1 - 2 * x)) / 2 if x < 0.5 else (1 + easeOutBounce(2 * x - 1)) / 2;
 	
-	# NOTE: i have no fucking clue if this is how noodle extentions implements is
-	static func easeStep(_x: float) -> float:
-		return 1
+	static func easeStep(x: float) -> float:
+		return floor(x)

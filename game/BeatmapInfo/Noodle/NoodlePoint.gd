@@ -22,9 +22,32 @@ static func create_point_from_data(arr:Array) -> PointDefinition:
 		p.points_array = create_vec3_from_data(arr)
 	elif parameter_size == 2:
 		p.points_array = create_float_from_data(arr)
+	elif parameter_size == 5:
+		p.points_array = create_color_from_data(arr)
 	else:
-		p.points_array = []
+		return null
 	return p
+
+static func create_color_from_data(arr:Array) -> Array[NoodlePoint]:
+	if arr[0] is Array:
+		var points:Array[NoodlePoint]
+		for point:Array in arr:
+			var vec:Color = Color(point[0],point[1],point[2],point[3])
+			var new_point:NoodlePoint = NoodlePoint.new()
+			new_point.data_point = vec
+			new_point.time = point[4]
+			if point.size() == 6:
+				new_point.easing = InterpolationHelper.Easings.get_easing_type(point[5])
+			points.append(new_point)
+		return points
+	else:
+		var vec:Color = Color(arr[0],arr[1],arr[2],arr[3])
+		var new_point:NoodlePoint = NoodlePoint.new()
+		new_point.data_point = vec
+		new_point.time = arr[4]
+		if arr.size() == 5:
+			new_point.easing = InterpolationHelper.Easings.get_easing_type(arr[5])
+		return [new_point]
 
 static func create_vec3_from_data(arr:Array) -> Array[NoodlePoint]:
 	if arr[0] is Array:

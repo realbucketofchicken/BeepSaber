@@ -6,6 +6,7 @@ uniform sampler2D texture_emission : hint_default_black;
 uniform sampler2D dissolve_texture;
 
 uniform float dissolve;
+uniform float dissolve_white_offset = 0.155;
 uniform float arrow_dissolve;
 uniform float metallic;
 uniform float roughness;
@@ -79,7 +80,11 @@ void fragment() {
 	if (dissolve > 0.0 || arrow_dissolve > 0.0){
 		float dissolve_tex = texture(dissolve_texture,UV).r;
 		if (dissolve_tex<dissolve && !arrow){
-			discard;
+			if (dissolve_tex<dissolve-(dissolve_white_offset*(1.0-dissolve))){
+				discard;
+			}
+			EMISSION = vec3(0.9) + color.rgb;
+			
 		}
 		if (arrow && !FRONT_FACING){
 			discard;

@@ -7,6 +7,12 @@
 [ext_resource type="PackedScene" uid="uid://cplhsipk6vhem" path="res://game/BeepCube/BeepCube_SliceParticles.tscn" id="5_tissj"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_7qxyk"]
+seed = 18
+frequency = 0.0053
+fractal_octaves = 1
+domain_warp_enabled = true
+domain_warp_amplitude = 44.57
+domain_warp_frequency = 0.01
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_x86ma"]
 noise = SubResource("FastNoiseLite_7qxyk")
@@ -19,9 +25,10 @@ shader_parameter/color = Color(1, 1, 1, 1)
 shader_parameter/texture_emission = ExtResource("4_10m2m")
 shader_parameter/dissolve_texture = SubResource("NoiseTexture2D_x86ma")
 shader_parameter/dissolve = 0.0
+shader_parameter/dissolve_white_offset = 0.155
 shader_parameter/arrow_dissolve = 0.0
 shader_parameter/metallic = 0.75
-shader_parameter/roughness = 0.22
+shader_parameter/roughness = 0.2
 shader_parameter/sub_emission_energy = 0.0
 shader_parameter/cutted = false
 shader_parameter/cut_dist_from_center = 0.0

@@ -30,6 +30,7 @@ var piece_right : CutPiece = null
 #####################
 var offset_positions_d:PointDefinition
 var definite_positions_d:PointDefinition
+var offset_local_rotation_d:PointDefinition
 var offset_rotation_d:PointDefinition
 var offset_scale_d:PointDefinition
 var cube_dissolve_d:PointDefinition
@@ -41,11 +42,11 @@ var disable_spawn_effect:bool
 var position_offset:Vector3
 @export var offset: Node3D
 @export var track_offset: Node3D
-var start_z:float
 var dissolve:float
 var arrow_dissolve:float
-var time:float
-var start_pos:Vector3
+var start_trans:Transform3D
+var njs:float
+var jd:float
 
 
 func _ready() -> void:
@@ -66,6 +67,7 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	speed = njs
 	beat = note_info.beat
+	time = jd/njs
 	which_saber = note_info.color
 	is_dot = note_info.cut_direction == 8
 	var noteLineIndex = note_info.line_index
@@ -101,11 +103,12 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 		(collision_big.shape as BoxShape3D).size.y = 0.5
 	
 	offset_positions_d = null
-	offset_rotation_d = null
+	offset_local_rotation_d = null
 	offset_scale_d = null
 	cube_dissolve_d = null
 	arrow_dissolve_d = null
 	definite_positions_d = null
+	offset_rotation_d = null
 	dissolve = 1.0
 	arrow_dissolve = 1.0
 	interactible = true
@@ -152,6 +155,9 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 						"_position":
 							var n_d = note_info.custom_data["_animation"]["_position"]
 							offset_positions_d = NoodlePoint.create_point_from_data(n_d)
+						"_localRotation":
+							var n_d = note_info.custom_data["_animation"]["_localRotation"]
+							offset_local_rotation_d = NoodlePoint.create_point_from_data(n_d)
 						"_rotation":
 							var n_d = note_info.custom_data["_animation"]["_rotation"]
 							offset_rotation_d = NoodlePoint.create_point_from_data(n_d)
@@ -168,7 +174,7 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 				push_warning("Unsupported parameter: ",dat)
 	piece_left.set_color(color)
 	piece_right.set_color(color)
-	_mat.set_shader_parameter(&"color", color)
+	set_color(color)
 	_mat.set_shader_parameter(&"is_dot", is_dot)
 	# since cube instances get recycled, we gotta reset cubes that were chain
 	# heads in a past life
@@ -192,31 +198,53 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 	var anim_speed := Map.current_difficulty.note_jump_movement_speed / 9.0
 	animation_player.speed_scale = maxf(min_speed,anim_speed)
 	if !disable_spawn_effect:
-		animation_player.play(&"Spawn")
+		pass
+		#animation_player.play(&"Spawn")
 	
 	slice_particles.reset()
 	mi.visible = true
-	transform.origin.z = -jd
-	start_z = -jd
-	start_pos = global_position
+	move_dir = transform.basis.z
+	var start_transform:Transform3D = transform
+	start_transform.origin.z = -jd/2
+	transform = start_transform
+	#start_transform.rotated_local()
+	start_trans = transform
+	self.njs = njs
+	self.jd = jd
+
+func set_color(color:Color) -> void:
+	_mat.set_shader_parameter(&"color", color)
 
 func _physics_process(delta: float) -> void:
 	super(delta)
-	time = -transform.origin.z/start_z
-	if offset_positions_d != null:
-		offset.position = InterpolationHelper.get_animation(offset_positions_d,time)
-	if offset_rotation_d != null:
-		offset.rotation_degrees = InterpolationHelper.get_animation(offset_rotation_d,time)
-	if offset_scale_d != null:
-		offset.scale = InterpolationHelper.get_animation(offset_scale_d,time)
-		offset.scale = offset.scale.max(Vector3.ONE*0.001)
+	#set_color(Color.WHITE * (1.0-((time / (jd/2/njs))-0.5)))
+	offset.rotation_degrees = Vector3.ZERO
+	offset.position = Vector3.ZERO
+	offset.scale = Vector3.ONE
 	if cube_dissolve_d != null:
 		dissolve = InterpolationHelper.get_animation(cube_dissolve_d,time)
 	if arrow_dissolve_d != null:
 		arrow_dissolve = InterpolationHelper.get_animation(arrow_dissolve_d,time)
+	if offset_positions_d != null:
+		offset.global_position += InterpolationHelper.get_animation(offset_positions_d,time)
 	if definite_positions_d != null:
-		offset.global_position = start_pos + InterpolationHelper.get_animation(definite_positions_d,time)*0.6
+		offset.global_position = start_trans.origin + InterpolationHelper.get_animation(definite_positions_d,time)*0.6
 		offset.global_position.z = InterpolationHelper.get_animation(definite_positions_d,time).z *0.6
+	if offset_local_rotation_d != null:
+		offset.rotation_degrees = InterpolationHelper.get_animation(offset_local_rotation_d,time)
+	if offset_scale_d != null:
+		offset.scale = InterpolationHelper.get_animation(offset_scale_d,time)
+		offset.scale = offset.scale.max(Vector3.ONE*0.001)
+	if offset_rotation_d:
+		var new_rot:Vector3 = InterpolationHelper.get_animation(offset_rotation_d,time)
+		var new_transform:Transform3D = Transform3D.IDENTITY
+		new_transform.origin.z = -jd
+		var length:float = new_transform.origin.length()
+		var one:Vector3 = new_transform.origin.normalized().cross(start_trans.origin.normalized())
+		var angle:float = new_transform.origin.normalized().angle_to(start_trans.origin.normalized())
+		new_transform = new_transform.rotated(one,angle)
+		new_transform.origin *= (1.0-((time / (jd/2/njs))-0.5))
+		transform = new_transform
 	
 	_mat.set_shader_parameter(&"dissolve", 1.0-dissolve)
 	_mat.set_shader_parameter(&"arrow_dissolve", 1.0-arrow_dissolve)

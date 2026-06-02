@@ -56,15 +56,15 @@ func calcHjd(offset: float,bpm:float,njs:float) -> float:
 func _process_map(game: BeepSaber_Game) -> void:
 	if (Map.current_info == null):
 		return
-	
 	var njs:float = Map.current_difficulty.note_jump_movement_speed
 	var beats_per_second:float = Map.current_info.beats_per_minute / 60 
 	var current_beat := game.song_player.get_playback_position() * (beats_per_second) 
 	var bpm:float = Map.current_info.beats_per_minute
 	var hjd:float = calcHjd(Map.current_difficulty.note_jump_start_beat_offset,bpm,njs)
-	var jd:float = njs * (60 / bpm) * hjd *2
+	var jd:float = njs * (60 / bpm) * hjd * 2
 	var rt:float = jd / (2 * njs)
-	var look_ahead := current_beat + rt*beats_per_second*2
+	var look_ahead := current_beat + rt*beats_per_second
+	
 	#print(rt/beats_per_second," ",jd," ",njs," ",look_ahead," ",current_beat)
 	#print(look_ahead - current_beat," ",reaction_time/2," ",beat," ",current_beat," ",jump_distance)
 	
@@ -74,10 +74,6 @@ func _process_map(game: BeepSaber_Game) -> void:
 	# why did they do this?
 	var note_info_refs: Array[ColorNoteInfo] = []
 	var cube_refs: Array[BeepCube] = []
-	print("gup: ",track_map.keys().size())
-	for track in track_map.keys():
-		if track_map[track].size() != 0:
-			print(track_map[track].size())
 	# spawn notes
 	while not Map.note_stack.is_empty() and Map.note_stack[-1].beat <= look_ahead:
 		var note := GlobalReferences.cube_pool.acquire() as BeepCube
@@ -162,15 +158,15 @@ func _process_map(game: BeepSaber_Game) -> void:
 			if track_map.has(track_name):
 				objects.append_array(track_map[track_name])
 		for object in objects:
-			var track_offset:Node3D
 			if object is not BeepCube:
 				push_error("unsupported type, please implement")
 				continue
 			var cube:BeepCube = object
+			cube.track_offset.rotation_degrees = Vector3.ZERO
+			cube.track_offset.position = Vector3.ZERO
+			cube.track_offset.scale = Vector3.ONE
 			if track.offset_positions != null:
-				cube.track_offset.position = InterpolationHelper.get_animation(track.offset_positions,track_progress,track.default_easing)
-			if track.offset_rotation != null:
-				cube.track_offset.rotation_degrees = InterpolationHelper.get_animation(track.offset_rotation,track_progress,track.default_easing)
+				cube.track_offset.global_position += InterpolationHelper.get_animation(track.offset_positions,track_progress,track.default_easing)
 			if track.offset_scale != null:
 				cube.track_offset.scale = InterpolationHelper.get_animation(track.offset_scale,track_progress,track.default_easing)
 				cube.track_offset.scale = cube.track_offset.scale.max(Vector3.ONE*0.001)
@@ -178,3 +174,16 @@ func _process_map(game: BeepSaber_Game) -> void:
 				cube.dissolve = InterpolationHelper.get_animation(track.cube_dissolve,track_progress,track.default_easing)
 			if track.arrow_dissolve != null:
 				cube.arrow_dissolve = InterpolationHelper.get_animation(track.arrow_dissolve,track_progress,track.default_easing)
+			if track.offset_local_rotation != null:
+				cube.track_offset.rotation_degrees = InterpolationHelper.get_animation(track.offset_local_rotation,track_progress,track.default_easing)
+			if track.colors != null:
+				cube.set_color(InterpolationHelper.get_animation(track.colors,track_progress,track.default_easing))
+			if track.offset_rotation:
+				var new_rot:Vector3 = InterpolationHelper.get_animation(track.offset_rotation,cube.time)
+				var new_transform:Transform3D = Transform3D.IDENTITY
+				new_transform.origin.z = -cube.jd
+				var rot_x = new_transform.orthonormalized().rotated(Vector3.RIGHT,deg_to_rad(new_rot.x))
+				var rot_y = rot_x.orthonormalized().rotated(Vector3.UP,deg_to_rad(new_rot.y))
+				
+				rot_y.origin *= ((cube.time / (cube.jd/cube.njs))-0.5)/2
+				cube.track_offset.transform = rot_y
