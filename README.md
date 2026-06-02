@@ -30,7 +30,7 @@ You can play custom songs by downloading them in the in-game menu.
 
 ## Current Progress:
 - **Mapping Extentions**: fully working
-- **Chroma**: working partially
+- **Chroma**: working partially(chroma enhancements cant be added)
 - **Noodle Extentions**: highly unfinished
 - **Vivify**: remains a dream... (although this exists https://github.com/V-Sekai/unidot_importer, so partial support may be possible)
 
