@@ -1,25 +1,16 @@
-[gd_scene load_steps=5 format=3 uid="uid://cpwxp083qm1jq"]
+[gd_scene format=3 uid="uid://cpwxp083qm1jq"]
 
 [ext_resource type="Theme" uid="uid://dvcjel72een6o" path="res://OQ_Toolkit/OQ_UI2D/theme/oq_ui2d_standard.theme" id="1"]
-[ext_resource type="Script" path="res://game/HighscorePanel.gd" id="2"]
+[ext_resource type="Script" uid="uid://dprq15263nixl" path="res://game/HighscorePanel.gd" id="2"]
 [ext_resource type="Texture2D" uid="uid://j1wa4gcqkltx" path="res://game/data/maps/Songs/TheFatRat_Timelapse/cover.jpg" id="4"]
 
-[sub_resource type="StyleBoxFlat" id="1"]
-bg_color = Color(0, 0, 0, 1)
-border_width_left = 8
-border_width_top = 8
-border_width_right = 8
-border_width_bottom = 8
-border_color = Color(1, 1, 1, 1)
-
-[node name="HighscorePanel" type="Panel"]
+[node name="HighscorePanel" type="Panel" unique_id=1102726359]
 offset_right = 940.0
 offset_bottom = 520.0
 theme = ExtResource("1")
-theme_override_styles/panel = SubResource("1")
 script = ExtResource("2")
 
-[node name="Margin" type="MarginContainer" parent="."]
+[node name="Margin" type="MarginContainer" parent="." unique_id=364898186]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -30,27 +21,27 @@ theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="VBox" type="VBoxContainer" parent="Margin"]
+[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=157379982]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Title" type="Label" parent="Margin/VBox"]
+[node name="Title" type="Label" parent="Margin/VBox" unique_id=1899983945]
 layout_mode = 2
 text = "Highscores (Hard)"
 
-[node name="LeftRight" type="HBoxContainer" parent="Margin/VBox"]
+[node name="LeftRight" type="HBoxContainer" parent="Margin/VBox" unique_id=613670193]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="ScrollContainer" type="ScrollContainer" parent="Margin/VBox/LeftRight"]
+[node name="ScrollContainer" type="ScrollContainer" parent="Margin/VBox/LeftRight" unique_id=978062467]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 1.5
 
-[node name="Margin" type="MarginContainer" parent="Margin/VBox/LeftRight/ScrollContainer"]
+[node name="Margin" type="MarginContainer" parent="Margin/VBox/LeftRight/ScrollContainer" unique_id=2101266263]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -59,217 +50,217 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="HighscoresList" type="VBoxContainer" parent="Margin/VBox/LeftRight/ScrollContainer/Margin"]
+[node name="HighscoresList" type="VBoxContainer" parent="Margin/VBox/LeftRight/ScrollContainer/Margin" unique_id=1434431873]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="BaseRecordRow" type="HBoxContainer" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList"]
+[node name="BaseRecordRow" type="HBoxContainer" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList" unique_id=1007516200]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RankLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow"]
+[node name="RankLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow" unique_id=1943320960]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 text = "1."
 
-[node name="NameLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow"]
+[node name="NameLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow" unique_id=1161695607]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Player 1"
 clip_text = true
 
-[node name="ScoreLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow"]
+[node name="ScoreLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow" unique_id=881366258]
 layout_mode = 2
 text = "100000"
 
-[node name="BaseRecordRow2" type="HBoxContainer" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList"]
+[node name="BaseRecordRow2" type="HBoxContainer" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList" unique_id=613914693]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RankLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow2"]
+[node name="RankLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow2" unique_id=895642328]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 text = "2."
 
-[node name="NameLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow2"]
+[node name="NameLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow2" unique_id=1496763036]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "I have a long name"
 clip_text = true
 
-[node name="ScoreLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow2"]
+[node name="ScoreLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow2" unique_id=591705392]
 layout_mode = 2
 text = "10000"
 
-[node name="BaseRecordRow3" type="HBoxContainer" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList"]
+[node name="BaseRecordRow3" type="HBoxContainer" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList" unique_id=1684026264]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RankLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow3"]
+[node name="RankLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow3" unique_id=1580372025]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 text = "3."
 
-[node name="NameLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow3"]
+[node name="NameLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow3" unique_id=1153896308]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "I have an extremely long name that goes of the page"
 clip_text = true
 
-[node name="ScoreLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow3"]
+[node name="ScoreLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow3" unique_id=720532946]
 layout_mode = 2
 text = "1000"
 
-[node name="BaseRecordRow4" type="HBoxContainer" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList"]
+[node name="BaseRecordRow4" type="HBoxContainer" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList" unique_id=1157358766]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RankLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow4"]
+[node name="RankLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow4" unique_id=335234035]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 text = "4."
 
-[node name="NameLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow4"]
+[node name="NameLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow4" unique_id=994137006]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Player 1"
 clip_text = true
 
-[node name="ScoreLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow4"]
+[node name="ScoreLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow4" unique_id=641072414]
 layout_mode = 2
 text = "1000"
 
-[node name="BaseRecordRow5" type="HBoxContainer" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList"]
+[node name="BaseRecordRow5" type="HBoxContainer" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList" unique_id=59419547]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RankLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow5"]
+[node name="RankLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow5" unique_id=940170432]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 text = "5."
 
-[node name="NameLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow5"]
+[node name="NameLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow5" unique_id=591194356]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Player 1"
 clip_text = true
 
-[node name="ScoreLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow5"]
+[node name="ScoreLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow5" unique_id=429237386]
 layout_mode = 2
 text = "1000"
 
-[node name="BaseRecordRow6" type="HBoxContainer" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList"]
+[node name="BaseRecordRow6" type="HBoxContainer" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList" unique_id=1006315646]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RankLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow6"]
+[node name="RankLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow6" unique_id=1473941672]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 text = "6."
 
-[node name="NameLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow6"]
+[node name="NameLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow6" unique_id=1931689794]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Player 1"
 clip_text = true
 
-[node name="ScoreLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow6"]
+[node name="ScoreLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow6" unique_id=1072601609]
 layout_mode = 2
 text = "1000"
 
-[node name="BaseRecordRow7" type="HBoxContainer" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList"]
+[node name="BaseRecordRow7" type="HBoxContainer" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList" unique_id=192761587]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RankLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow7"]
+[node name="RankLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow7" unique_id=1179480193]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 text = "7."
 
-[node name="NameLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow7"]
+[node name="NameLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow7" unique_id=1835131652]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Player 1"
 clip_text = true
 
-[node name="ScoreLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow7"]
+[node name="ScoreLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow7" unique_id=1335027391]
 layout_mode = 2
 text = "1000"
 
-[node name="BaseRecordRow8" type="HBoxContainer" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList"]
+[node name="BaseRecordRow8" type="HBoxContainer" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList" unique_id=1632226979]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RankLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow8"]
+[node name="RankLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow8" unique_id=819986914]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 text = "8."
 
-[node name="NameLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow8"]
+[node name="NameLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow8" unique_id=1515729710]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Player 1"
 clip_text = true
 
-[node name="ScoreLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow8"]
+[node name="ScoreLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow8" unique_id=772751041]
 layout_mode = 2
 text = "1000"
 
-[node name="BaseRecordRow9" type="HBoxContainer" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList"]
+[node name="BaseRecordRow9" type="HBoxContainer" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList" unique_id=1889020277]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RankLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow9"]
+[node name="RankLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow9" unique_id=1157260672]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 text = "9."
 
-[node name="NameLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow9"]
+[node name="NameLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow9" unique_id=1145941675]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Player 1"
 clip_text = true
 
-[node name="ScoreLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow9"]
+[node name="ScoreLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow9" unique_id=1432352330]
 layout_mode = 2
 text = "1000"
 
-[node name="BaseRecordRow10" type="HBoxContainer" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList"]
+[node name="BaseRecordRow10" type="HBoxContainer" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList" unique_id=655695161]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RankLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow10"]
+[node name="RankLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow10" unique_id=1433692416]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 text = "10."
 
-[node name="NameLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow10"]
+[node name="NameLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow10" unique_id=1629828705]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Player 1"
 clip_text = true
 
-[node name="ScoreLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow10"]
+[node name="ScoreLabel" type="Label" parent="Margin/VBox/LeftRight/ScrollContainer/Margin/HighscoresList/BaseRecordRow10" unique_id=1776912659]
 layout_mode = 2
 text = "1000"
 
-[node name="VBox" type="VBoxContainer" parent="Margin/VBox/LeftRight"]
+[node name="VBox" type="VBoxContainer" parent="Margin/VBox/LeftRight" unique_id=1311235175]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="SongCover" type="TextureRect" parent="Margin/VBox/LeftRight/VBox"]
+[node name="SongCover" type="TextureRect" parent="Margin/VBox/LeftRight/VBox" unique_id=2032377752]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -277,14 +268,14 @@ texture = ExtResource("4")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="SongInfo_Label" type="Label" parent="Margin/VBox/LeftRight/VBox"]
+[node name="SongInfo_Label" type="Label" parent="Margin/VBox/LeftRight/VBox" unique_id=1767099993]
 layout_mode = 2
 text = "Song Author: TheFatRat
 Song Title: Time Lapse
 Beatmap Author: Timeweaver"
 clip_text = true
 
-[node name="Exit_Button" type="Button" parent="Margin/VBox"]
+[node name="Exit_Button" type="Button" parent="Margin/VBox" unique_id=1786142223]
 layout_mode = 2
 text = "Close"
 

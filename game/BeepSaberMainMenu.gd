@@ -45,10 +45,20 @@ var _recently_added_songs: Array[MapInfo] # newest is first, oldest is last
 var _most_played_songs: Array[MapInfo] # most played is first, least played is last
 var _currently_selected_songlist_ref: Array[MapInfo] = _all_songs # reference to whichever map list is the currently selected one
 
+var cover_dict:Dictionary[int,String]
+
 # stop the preview player if the main song player is going
+var last_scroll:int
 func _physics_process(_delta: float) -> void:
+	var scroll:ScrollBar = songs_menu.get_v_scroll_bar()
+	var v_scroll:int = int(scroll.value)
+	# this keeps the scroll thingy always the same size, so its easier to use
+	scroll.page =(scroll.max_value-scroll.min_value)*0.04
+	if v_scroll != last_scroll:
+		update_covers()
 	if main_song_player_ref.playing:
 		song_preview.stop()
+	last_scroll = v_scroll
 
 func refresh_playlist() -> void:
 	var id := playlist_selector.get_selected_id()
@@ -139,19 +149,19 @@ func _set_cur_playlist(songs: Array[MapInfo]) -> void:
 	songs_menu.clear()
 	
 	var song_count := songs.size()
-	var map_index := 0
+	var idx:int = 0
 	for map in songs:
 		@warning_ignore("return_value_discarded")
 		songs_menu.add_item("%s - %s" % [map.song_author_name, map.song_name], default_song_icon)
-		var filepath := map.filepath + map.cover_image_filename
-		_bg_img_loader.load_texture(filepath, _on_cover_loaded, false, map_index)
-		map_index += 1
+		cover_dict[idx] = map.filepath + map.cover_image_filename
+		idx += 1
 	
 	if current_id.size() > 0:
 		var selected_id := current_id[0]
 		if selected_id >= song_count:
 			selected_id = song_count - 1
 		_select_song(selected_id)
+	update_covers.call_deferred()
 
 var default_song_icon := preload("res://game/data/beepsaber_logo.png")
 
@@ -308,11 +318,7 @@ func _select_song(id: int) -> void:
 	#warnMapping.visible = Constants.usingMappingExtension
 	#warnNoodle.visible = Constants.usingNoodleExtension
 	#warnChroma.visible = Constants.usingChroma
-	($SongInfo_Label as Label).text = """Song Author: %s
-	Song Title: %s
-	Beatmap Author: %s
-	Play Count: %d
-	Mods requrired: %s""" % [
+	($SongInfo_Label as Label).text = "Song Author: %s\nSong Title: %s\nBeatmap Author: %s\nPlay Count: %d\nMods requrired: %s" % [
 		map.song_author_name,
 		map.song_name,
 		map.level_author_name,
@@ -407,6 +413,7 @@ func _ready() -> void:
 	playlist_selector.add_item("All Songs")
 	playlist_selector.add_item("Recently Added")
 	playlist_selector.add_item("Most Played")
+	
 	
 	_load_playlists()
 	
@@ -531,3 +538,17 @@ func _on_PlaylistSelector_item_selected(id: int) -> void:
 		_:
 			vr.log_warning("Unsupported playlist option %s" % id)
 			_set_cur_playlist(_all_songs)
+
+func update_covers() -> void:
+	for i in range(songs_menu.item_count-1):
+		var on_screen:bool
+		var v_pos:float = songs_menu.get_item_rect(i).position.y
+		var v_size:float = songs_menu.get_item_rect(i).size.y
+		var v_scroll:float = songs_menu.get_v_scroll_bar().value
+		var v_height:float = songs_menu.get_rect().size.y
+		on_screen = v_pos > v_scroll-v_size && v_pos < v_scroll+v_height
+		#print(v_scroll)
+		if on_screen && songs_menu.get_item_icon(i) == default_song_icon:
+			_bg_img_loader.load_texture(cover_dict[i], _on_cover_loaded, false, i)
+		elif !on_screen && songs_menu.get_item_icon(i) != default_song_icon:
+			songs_menu.set_item_icon(i,default_song_icon)

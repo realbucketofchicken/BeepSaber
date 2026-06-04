@@ -1,7 +1,6 @@
 extends Panel
 
 @export var beat_saver_panel: BeatSaverPanel
-@export var beat_sage_panel: BeatSagePanel
 
 @onready var beat_saver_button := $Margin/VBox/Grid/BeatSaverButton as Button
 @onready var beat_sage_button := $Margin/VBox/Grid/BeatSageButton as Button
@@ -20,8 +19,6 @@ func _ready() -> void:
 	# initialize items related to Beat Sage UI Dialog
 	if is_instance_valid(beat_saver_panel):
 		@warning_ignore("return_value_discarded")
-		beat_sage_panel.visibility_changed.connect(
-			_on_MapSourceUI_closed.bind(beat_sage_panel))
 	else:
 		vr.log_warning('_beat_sage_panel is null')
 		beat_sage_button.disabled = true
@@ -52,10 +49,6 @@ func _show() -> void:
 
 func _on_BeatSaverButton_pressed() -> void:
 	beat_saver_panel._show()
-	self._hide()
-
-func _on_BeatSageButton_pressed() -> void:
-	beat_sage_panel._show()
 	self._hide()
 
 func _on_MapSourceUI_closed(ui_panel: Panel) -> void:

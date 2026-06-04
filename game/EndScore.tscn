@@ -14,8 +14,8 @@ render_priority = 0
 shader = ExtResource("1_cfcnp")
 shader_parameter/size = Vector2(1, 0.5)
 shader_parameter/bg_color = Color(0.129, 0.133, 0.173, 1)
-shader_parameter/highlight_color = Color(0.364, 0.42, 0.223, 1)
-shader_parameter/highlight = 1.0
+shader_parameter/highlight_color = Color(0.3055095, 0.5055025, 0.5234681, 1)
+shader_parameter/highlight = 0.0
 
 [sub_resource type="QuadMesh" id="QuadMesh_le4ok"]
 material = SubResource("ShaderMaterial_igkn4")
@@ -1369,39 +1369,39 @@ mesh = SubResource("QuadMesh_le4ok")
 script = ExtResource("1_jacne")
 
 [node name="PercentIndicator" parent="." unique_id=1571255092 instance=ExtResource("2_dpn16")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.030136026)
 material_override = SubResource("ShaderMaterial_h20bd")
 
 [node name="Repeat" parent="." unique_id=1490923076 instance=ExtResource("4_n4s7s")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, -0.35, 0.1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, -0.35, 0.030136026)
 size = Vector2(0.5, 0.125)
 text = "Repeat"
 
 [node name="MainMenu" parent="." unique_id=1204467553 instance=ExtResource("4_n4s7s")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, -0.35, 0.1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, -0.35, 0.030136026)
 size = Vector2(0.5, 0.125)
 text = "Main Menu"
 
 [node name="Details" type="MeshInstance3D" parent="." unique_id=1134717937]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0.25, 0.1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0.25, 0.030136026)
 material_override = SubResource("StandardMaterial3D_cwpr4")
 mesh = SubResource("TextMesh_siova")
 
 [node name="GradeMesh" type="MeshInstance3D" parent="." unique_id=286790637]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.693, 0, 0.1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.693, 0, 0.030136026)
 mesh = SubResource("QuadMesh_u7okp")
 
 [node name="NameLabel" type="MeshInstance3D" parent="." unique_id=960998814]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.925, 0.45, 0.1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8887648, 0.45, 0.030136026)
 material_override = ExtResource("6_2vw0d")
 mesh = SubResource("TextMesh_o35jt")
 
 [node name="FCMesh" type="MeshInstance3D" parent="." unique_id=353777539]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, -0.25, 0.1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, -0.25, 0.030136026)
 mesh = SubResource("QuadMesh_eor5b")
 
 [node name="NRMesh" type="MeshInstance3D" parent="." unique_id=1570425623]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0.3, 0.1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0.3, 0.030136026)
 mesh = SubResource("QuadMesh_k3idy")
 
 [node name="FCViewport" type="SubViewport" parent="." unique_id=712138563]

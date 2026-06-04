@@ -63,6 +63,8 @@ func pop_front() -> Variant:
 	if _len == 0:
 		return null
 	else:
+		if !_tail:
+			return null
 		var result: Variant = _tail.data
 		_tail = _tail.next
 		_len -= 1

@@ -27,10 +27,8 @@
 [ext_resource type="PackedScene" uid="uid://cpwxp083qm1jq" path="res://game/HighscorePanel.tscn" id="23"]
 [ext_resource type="PackedScene" uid="uid://6du64wi28yi6" path="res://game/Bomb/Bomb.tscn" id="24"]
 [ext_resource type="PackedScene" uid="uid://cj71atwq2eow8" path="res://game/ui/NameSelector/NameSelector.tscn" id="25"]
-[ext_resource type="PackedScene" uid="uid://cb8ftj7lpxrfy" path="res://game/ui/YouTubeUI/YouTubeUI.tscn" id="26"]
 [ext_resource type="PackedScene" uid="uid://cjirr6sfxfhhd" path="res://game/scripts/ScenePool/ScenePool.tscn" id="27"]
 [ext_resource type="PackedScene" uid="uid://dkqqtux44xxe7" path="res://game/ui/MapDownloadPanel/MapDownloadPanel.tscn" id="28"]
-[ext_resource type="PackedScene" uid="uid://bmdbiqndkvcm6" path="res://game/ui/BeatSageUI/BeatSageUI.tscn" id="29"]
 [ext_resource type="PackedScene" uid="uid://cbbovki8xp6e2" path="res://game/GodotSplash.tscn" id="29_vrn2v"]
 [ext_resource type="PackedScene" uid="uid://cgfj82g2xp1ne" path="res://OQ_Toolkit/OQ_UI2D/OQ_UI2DLogWindow.tscn" id="31"]
 [ext_resource type="Script" uid="uid://d1la3rbs4bryo" path="res://game/scripts/SongUploader/song_uploader.gd" id="33_l0uxg"]
@@ -83,7 +81,7 @@ font_size = 6
 vertical_alignment = 0
 depth = 0.0
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_sm0lh"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rsu5u"]
 resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("14_155do")
@@ -195,7 +193,7 @@ skeleton = NodePath("")
 
 [node name="Percent_Indicator" parent="." unique_id=759676450 instance=ExtResource("16")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1, -2.5)
-material_override = SubResource("ShaderMaterial_sm0lh")
+material_override = SubResource("ShaderMaterial_rsu5u")
 mesh = SubResource("QuadMesh_02xdc")
 
 [node name="EndScore" parent="." unique_id=1143902141 instance=ExtResource("20_fgfws")]
@@ -230,9 +228,8 @@ transform = Transform3D(0.346575, 0, -0.938022, 0, 1, 0, 0.938022, 0, 0.346575, 
 [node name="MapDownload_Canvas" parent="MapSourceDialogs" unique_id=1374783670 instance=ExtResource("3")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
 
-[node name="MapDownloadPanel" parent="MapSourceDialogs/MapDownload_Canvas" unique_id=1591999343 node_paths=PackedStringArray("beat_saver_panel", "beat_sage_panel") instance=ExtResource("28")]
+[node name="MapDownloadPanel" parent="MapSourceDialogs/MapDownload_Canvas" unique_id=1591999343 node_paths=PackedStringArray("beat_saver_panel") instance=ExtResource("28")]
 beat_saver_panel = NodePath("../../BeatSaver_Canvas/BeatSaverPanel")
-beat_sage_panel = NodePath("../../BeatSage_Canvas/BeatSageUI")
 
 [node name="BeatSaver_Canvas" parent="MapSourceDialogs" unique_id=1844943705 instance=ExtResource("3")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
@@ -240,19 +237,6 @@ visible = false
 
 [node name="BeatSaverPanel" parent="MapSourceDialogs/BeatSaver_Canvas" unique_id=127504806 node_paths=PackedStringArray("main_menu_ref", "keyboard") instance=ExtResource("20")]
 main_menu_ref = NodePath("../../../MainMenu_OQ_UI2DCanvas/BeepSaberMainMenu")
-keyboard = NodePath("../../../Keyboard_online_search")
-
-[node name="BeatSage_Canvas" parent="MapSourceDialogs" unique_id=1310998309 instance=ExtResource("3")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
-visible = false
-
-[node name="BeatSageUI" parent="MapSourceDialogs/BeatSage_Canvas" unique_id=1571704282 instance=ExtResource("29")]
-
-[node name="YouTube_Canvas" parent="MapSourceDialogs" unique_id=310454632 instance=ExtResource("3")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0.01)
-visible = false
-
-[node name="YouTubeUI" parent="MapSourceDialogs/YouTube_Canvas" unique_id=315464337 node_paths=PackedStringArray("keyboard") instance=ExtResource("26")]
 keyboard = NodePath("../../../Keyboard_online_search")
 
 [node name="Keyboard_online_search" parent="." unique_id=1743222280 instance=ExtResource("21")]

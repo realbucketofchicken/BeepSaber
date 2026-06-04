@@ -1,18 +1,16 @@
-[gd_scene load_steps=6 format=3 uid="uid://dkqqtux44xxe7"]
+[gd_scene format=3 uid="uid://dkqqtux44xxe7"]
 
-[ext_resource type="Theme" uid="uid://cbutfawaljce6" path="res://game/BlackWhiteThem.tres" id="1"]
 [ext_resource type="PackedScene" uid="uid://btf734vme0j3t" path="res://game/ui/MapDownloadPanel/MapSourceButton.tscn" id="2"]
 [ext_resource type="Texture2D" uid="uid://dycn47j2d352k" path="res://game/ui/BeatSaverPanel/beatsaver_icon.png" id="3"]
-[ext_resource type="Script" path="res://game/ui/MapDownloadPanel/MapDownloadPanel.gd" id="4"]
-[ext_resource type="Texture2D" uid="uid://bmetc7xglkymg" path="res://game/ui/BeatSageUI/beat_sage_icon.png" id="5"]
+[ext_resource type="Theme" uid="uid://dvcjel72een6o" path="res://OQ_Toolkit/OQ_UI2D/theme/oq_ui2d_standard.theme" id="3_r4xi6"]
+[ext_resource type="Script" uid="uid://ce1q3opjb3uge" path="res://game/ui/MapDownloadPanel/MapDownloadPanel.gd" id="4"]
 
-[node name="MapDownloadPanel" type="Panel"]
+[node name="MapDownloadPanel" type="Panel" unique_id=793474579]
 offset_right = 1536.0
 offset_bottom = 960.0
-theme = ExtResource("1")
 script = ExtResource("4")
 
-[node name="Margin" type="MarginContainer" parent="."]
+[node name="Margin" type="MarginContainer" parent="." unique_id=1015439851]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -21,31 +19,25 @@ theme_override_constants/margin_top = 25
 theme_override_constants/margin_right = 25
 theme_override_constants/margin_bottom = 25
 
-[node name="VBox" type="VBoxContainer" parent="Margin"]
+[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=1361627555]
 layout_mode = 2
 
-[node name="Title" type="Label" parent="Margin/VBox"]
+[node name="Title" type="Label" parent="Margin/VBox" unique_id=1550292483]
 layout_mode = 2
 theme_override_font_sizes/font_size = 46
 text = "Online Map Sources"
 
-[node name="Grid" type="GridContainer" parent="Margin/VBox"]
+[node name="Grid" type="GridContainer" parent="Margin/VBox" unique_id=1325306787]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 columns = 2
 
-[node name="BeatSaverButton" parent="Margin/VBox/Grid" instance=ExtResource("2")]
+[node name="BeatSaverButton" parent="Margin/VBox/Grid" unique_id=694097800 instance=ExtResource("2")]
 layout_mode = 2
+theme = ExtResource("3_r4xi6")
 texture = ExtResource("3")
 image_margin = 50
 description = "Beat Saver is an online collection of custom Beat Saber levels. You can search and download songs based on song title, song artist, or by mapper (level artist)."
 
-[node name="BeatSageButton" parent="Margin/VBox/Grid" instance=ExtResource("2")]
-visible = false
-layout_mode = 2
-texture = ExtResource("5")
-description = "Beat Sage is an AI that creates free custom levels for Beat Saber. Given a song on YouTube, the system will output a Beat Saber level that is matched with that song!"
-
 [connection signal="pressed" from="Margin/VBox/Grid/BeatSaverButton" to="." method="_on_BeatSaverButton_pressed"]
-[connection signal="pressed" from="Margin/VBox/Grid/BeatSageButton" to="." method="_on_BeatSageButton_pressed"]
