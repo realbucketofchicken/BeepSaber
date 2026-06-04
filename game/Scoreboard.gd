@@ -32,13 +32,10 @@ func add_points(position: Vector3, amount: int) -> void:
 	@warning_ignore("integer_division")
 	multiplier = 1 + mini(combo / 10, 7)
 	points += amount * multiplier
-	
-	points_awarded.emit(position, str(amount))
-	score_changed.emit()
 	# track accuracy percent
-	var normalized_points := clampf(float(points)/80.0, 0.0, 1.0);
-	right_notes += normalized_points
-	wrong_notes += 1.0-normalized_points
+	right_notes += 1
+	score_changed.emit()
+	points_awarded.emit(position, str(amount))
 
 func chain_link_cut(position: Vector3) -> void:
 	add_points(position, 20)
@@ -50,6 +47,10 @@ func note_cut(position: Vector3, cut_distance_accuracy: float, travel_distance_f
 	
 	points_new = roundf(points_new)
 	add_points(position, int(points_new))
+
+func on_miss(position: Vector3) -> void:
+	reset_combo()
+	points_awarded.emit(position, "MISS!")
 
 func bad_cut(position: Vector3) -> void:
 	reset_combo()

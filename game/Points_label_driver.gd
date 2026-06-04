@@ -15,9 +15,7 @@ func _ready():
 
 
 func show_points(_position: Vector3, value: String):
-	if value == "0":
-		value = "x"
-	var color := Color(1,0,0) if value == "x" else Color(1,1,1)
+	var color := Color(1,0,0) if value == "x" or value == "MISS!" else Color(1,1,1)
 	points_label[current_point_label].show_points(_position,value,color)
 	current_point_label += 1
 	current_point_label %= 4

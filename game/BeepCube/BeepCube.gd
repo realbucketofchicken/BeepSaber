@@ -217,7 +217,7 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 	beep_cube_small.collision_layer = 0x0
 	beep_cube_small.set_collision_layer_value(CollisionLayerConstants.LeftNote_bit, true)
 	beep_cube_small.set_collision_layer_value(CollisionLayerConstants.RightNote_bit, true)
-	
+	set_collision_disabled(false)
 	# play the spawn animation when this cube enters the scene
 	var anim_speed := Map.current_difficulty.note_jump_movement_speed / 9.0
 	animation_player.speed_scale = maxf(min_speed,anim_speed)
@@ -243,7 +243,7 @@ func _physics_process(delta: float) -> void:
 	time = 1.0-(real_time/original_time)
 	
 	#set_color(Color.WHITE * time)
-	if !Scoreboard.paused or not is_visible_in_tree() or not Map.current_info:
+	if !Scoreboard.paused and is_visible_in_tree() and Map.current_info:
 		movement_offset.transform.origin += move_dir * speed * delta
 	offset.rotation_degrees = Vector3.ZERO
 	offset.position = Vector3.ZERO
@@ -262,14 +262,15 @@ func _physics_process(delta: float) -> void:
 	if offset_scale_d != null:
 		offset.scale = InterpolationHelper.get_animation(offset_scale_d,time)
 		offset.scale = offset.scale.max(Vector3.ONE*0.001)
-	global_rotation = Vector3.ZERO
+	#global_rotation = Vector3.ZERO
 	if offset_rotation_d:
 		var new_rot:Vector3 = InterpolationHelper.get_animation(offset_rotation_d,time)
 		global_rotation = new_rot
 	
 	_mat.set_shader_parameter(&"dissolve", 1.0-dissolve)
 	_mat.set_shader_parameter(&"arrow_dissolve", 1.0-arrow_dissolve)
-
+	if time > 0.53:
+		on_miss()
 
 # call this when clearing the track
 func clear_from_track() -> void:
@@ -292,7 +293,7 @@ func make_chain_head() -> void:
 
 func on_miss() -> void:
 	if !is_fake:
-		Scoreboard.reset_combo()
+		Scoreboard.on_miss(global_position + movement_offset.position*Vector3(1,1,0))
 	hide_cube()
 	release()
 
@@ -309,15 +310,15 @@ func cut(saber_type: int, cut_speed: Vector3, cut_plane: Plane, controller: Beep
 	print("hit on , ",area)
 	# compute the angle between the cube orientation and the cut direction
 	var cut_direction_xy := -Vector3(cut_speed.x, cut_speed.y, 0.0).normalized()
-	var base_cut_angle_accuracy := global_transform.basis.y.dot(cut_direction_xy)
-	var cut_distance := cut_plane.distance_to(global_transform.origin)
+	var base_cut_angle_accuracy := movement_offset.global_transform.basis.y.dot(cut_direction_xy)
+	var cut_distance := cut_plane.distance_to(movement_offset.global_transform.origin)
 	
 	if saber_type == which_saber:
-		if base_cut_angle_accuracy < 0.75 && !is_dot:
-			#print(collision_small.get_parent(), " ", area)
+		# 0.7 = 45 degree
+		if base_cut_angle_accuracy < 0.7 && !is_dot:
 			if area == collision_small.get_parent():
 				if !is_fake:
-					Scoreboard.bad_cut(transform.origin)
+					Scoreboard.bad_cut(movement_offset.global_position)
 				cutted.emit(false)
 				hit = true
 			else:
@@ -328,12 +329,12 @@ func cut(saber_type: int, cut_speed: Vector3, cut_plane: Plane, controller: Beep
 			travel_distance_factor = clampf((travel_distance_factor-0.04)/0.1, 0.0, 1.0)
 			# allows a bit of save margin where the beat is considered 100% correct
 			if !is_fake:
-				Scoreboard.note_cut(transform.origin, cut_distance_accuracy, travel_distance_factor)
+				Scoreboard.note_cut(movement_offset.global_position, cut_distance_accuracy, travel_distance_factor)
 			cutted.emit(true)
 			hit = true
 	else:
 		if !is_fake:
-			Scoreboard.bad_cut(transform.origin)
+			Scoreboard.bad_cut(movement_offset.global_position)
 		cutted.emit(false)
 		hit = true
 	

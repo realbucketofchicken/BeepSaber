@@ -33,9 +33,4 @@ func _physics_process(delta: float) -> void:
 	if Scoreboard.paused or not is_visible_in_tree() or not Map.current_info: return
 	real_time -=delta
 	# enable collisions when cuttable gets close enough to player
-	if global_transform.origin.z > -3.0:
-		set_collision_disabled(false)
 	
-	# remove children that go to far
-	if real_time <= 0:
-		on_miss()

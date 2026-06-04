@@ -251,13 +251,13 @@ static func load_cutom_data_v2(custom_data: Dictionary) -> void:
 					if n_d is String:
 						event_info.offset_local_rotation = find_point_def(point_defs,StringName(n_d))
 					else:
-						event_info.offset_local_rotation = NoodlePoint.create_point_from_data(n_d)
+						event_info.offset_local_rotation = NoodlePoint.create_point_from_data(n_d,true)
 				"_rotation": 
 					var n_d = data["_rotation"]
 					if n_d is String:
 						event_info.offset_rotation = find_point_def(point_defs,StringName(n_d))
 					else:
-						event_info.offset_rotation = NoodlePoint.create_point_from_data(n_d)
+						event_info.offset_rotation = NoodlePoint.create_point_from_data(n_d,true)
 				"_easing":
 					event_info.default_easing = data["_easing"]
 				"_color":

@@ -179,5 +179,5 @@ func _process_map(game: BeepSaber_Game) -> void:
 				cube.set_color(InterpolationHelper.get_animation(track.colors,track_progress,track.default_easing))
 			if track.offset_rotation:
 				var new_rot:Vector3 = InterpolationHelper.get_animation(track.offset_rotation,cube.time)
-				cube.global_rotation += new_rot
+				cube.global_rotation = new_rot
 				#cube.track_offset.transform = rot_y
