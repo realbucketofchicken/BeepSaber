@@ -6,7 +6,7 @@ var data_point:Variant
 var time:float ## 0 to 1 value indicating the objects lifespan
 var easing:InterpolationHelper.Easings.easing_types
 
-static func create_point_from_data(arr:Array) -> PointDefinition:
+static func create_point_from_data(arr:Array,is_rotation:bool = false) -> PointDefinition:
 	var p:PointDefinition = PointDefinition.new()
 	var working_array:Array
 	if arr[0] is Array:
@@ -19,7 +19,7 @@ static func create_point_from_data(arr:Array) -> PointDefinition:
 		working_array.pop_back()
 	# keep in mind this will still include the time info, thats why theres one more
 	if parameter_size == 4:
-		p.points_array = create_vec3_from_data(arr)
+		p.points_array = create_vec3_from_data(arr,is_rotation)
 	elif parameter_size == 2:
 		p.points_array = create_float_from_data(arr)
 	elif parameter_size == 5:
@@ -49,11 +49,15 @@ static func create_color_from_data(arr:Array) -> Array[NoodlePoint]:
 			new_point.easing = InterpolationHelper.Easings.get_easing_type(arr[5])
 		return [new_point]
 
-static func create_vec3_from_data(arr:Array) -> Array[NoodlePoint]:
+static func create_vec3_from_data(arr:Array,is_rotation:bool=false) -> Array[NoodlePoint]:
 	if arr[0] is Array:
 		var points:Array[NoodlePoint]
 		for point:Array in arr:
 			var vec:Vector3 = Vector3(point[0],point[1],point[2])
+			if is_rotation:
+				vec = Vector3(deg_to_rad(point[0]),deg_to_rad(point[1]),deg_to_rad(point[2]))
+			else:
+				vec = Vector3(point[0],point[1],point[2])
 			var new_point:NoodlePoint = NoodlePoint.new()
 			new_point.data_point = vec
 			new_point.time = point[3]

@@ -145,7 +145,6 @@ func _process_map(game: BeepSaber_Game) -> void:
 		game.event_driver.process_event(Map.event_stack.pop_back() as EventInfo)
 	
 	while not Map.animate_track_stack.is_empty() and Map.animate_track_stack[-1].beat <= current_beat:
-		print("track spawned")
 		tracks.append(Map.animate_track_stack.pop_back() as AnimateTrackInfo)
 	
 	for track in tracks:
@@ -180,10 +179,5 @@ func _process_map(game: BeepSaber_Game) -> void:
 				cube.set_color(InterpolationHelper.get_animation(track.colors,track_progress,track.default_easing))
 			if track.offset_rotation:
 				var new_rot:Vector3 = InterpolationHelper.get_animation(track.offset_rotation,cube.time)
-				var new_transform:Transform3D = Transform3D.IDENTITY
-				new_transform.origin.z = -cube.jd
-				var rot_x = new_transform.orthonormalized().rotated(Vector3.RIGHT,deg_to_rad(new_rot.x))
-				var rot_y = rot_x.orthonormalized().rotated(Vector3.UP,deg_to_rad(new_rot.y))
-				
-				rot_y.origin *= ((cube.time / (cube.jd/cube.njs))-0.5)/2
-				cube.track_offset.transform = rot_y
+				cube.global_rotation += new_rot
+				#cube.track_offset.transform = rot_y

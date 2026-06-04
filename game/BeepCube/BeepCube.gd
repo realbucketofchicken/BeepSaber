@@ -2,6 +2,14 @@
 extends Cuttable
 class_name BeepCube
 
+# let me expain this stupid transform nonesense you can see in the nodetree:
+# the root node is always spawned at the players position, and it will stay there
+# the root is also the node that gets rotated by the lane offsets
+#
+# the MovementOffset moves line a note normally would
+# the track offset does all offset positons/rotations/scales that tracks give the note
+# and the offset does the same BUT for stuff specific to this note
+
 # emitted when the cube gets cutted, correct_saber is true if the right saber was used
 signal cutted(correct_saber: bool)
 
@@ -25,6 +33,8 @@ var _mat: ShaderMaterial
 var piece_left : CutPiece = null
 var piece_right : CutPiece = null
 
+@export var movement_offset: Node3D
+
 #####################
 # NOODLE EXTENTIONS #
 #####################
@@ -42,12 +52,15 @@ var disable_spawn_effect:bool
 var position_offset:Vector3
 @export var offset: Node3D
 @export var track_offset: Node3D
+
 var dissolve:float
 var arrow_dissolve:float
 var start_trans:Transform3D
 var njs:float
 var jd:float
 var hit:bool
+var original_time:float
+var time:float
 
 func _ready() -> void:
 	_mat = mi.material_override as ShaderMaterial
@@ -64,10 +77,12 @@ func _ready() -> void:
 func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:float,jd:float) -> void:
 	# re-enable our process_mode first otherwise it seems like Godot-internals
 	# can behave weirdly (ex. AnimationPlayer won't always play correctly)
+	transform = Transform3D.IDENTITY
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	speed = njs
 	beat = note_info.beat
-	time = jd/njs
+	real_time = jd/njs
+	original_time = real_time
 	which_saber = note_info.color
 	is_dot = note_info.cut_direction == 8
 	var noteLineIndex = note_info.line_index
@@ -83,19 +98,19 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 	track_offset.rotation = Vector3.ZERO
 	if noteLineIndex >= 1000 or noteLineIndex <= -1000:
 		if sign(note_info.line_index) == 1:
-			transform.origin.x = ((note_info.line_index / 1000.0) - 2.5)
+			movement_offset.transform.origin.x = ((note_info.line_index / 1000.0) - 2.5)
 		else:
-			transform.origin.x = ((note_info.line_index / 1000.0) - 0.5)
-		transform.origin.y = ((noteLayerIndex - 1000.0) / 1000.0 + 0.8)
+			movement_offset.transform.origin.x = ((note_info.line_index / 1000.0) - 0.5)
+		movement_offset.transform.origin.y = ((noteLayerIndex - 1000.0) / 1000.0 + 0.8)
 	else:
-		transform.origin.x = (note_info.line_index * 0.6) + Constants.LANE_ZERO_X
-		transform.origin.y = (note_info.line_layer * 0.6 ) + Constants.LAYER_ZERO_Y
+		movement_offset.transform.origin.x = (note_info.line_index * 0.6) + Constants.LANE_ZERO_X
+		movement_offset.transform.origin.y = (note_info.line_layer * 0.6 ) + Constants.LAYER_ZERO_Y
 
 	
 	if note_info.cut_direction < 9:
-		rotation.z = Constants.CUBE_ROTATIONS[note_info.cut_direction] + deg_to_rad(note_info.angle_offset)
+		movement_offset.rotation.z = Constants.CUBE_ROTATIONS[note_info.cut_direction] + deg_to_rad(note_info.angle_offset)
 	else:
-		rotation.z = deg_to_rad((note_info.cut_direction - 1000) * -1)
+		movement_offset.rotation.z = deg_to_rad((note_info.cut_direction - 1000) * -1)
 	
 	if is_dot:
 		(collision_big.shape as BoxShape3D).size.y = 0.8
@@ -122,13 +137,13 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 		match dat:
 			"_position":
 				var pos:Array = note_info.custom_data["_position"]
-				transform.origin = Vector3(pos[0]* 0.6,(pos[1]* 0.6) + Constants.LAYER_ZERO_Y,transform.origin.z)
+				movement_offset.transform.origin = Vector3(pos[0]* 0.6,(pos[1]* 0.6) + Constants.LAYER_ZERO_Y,transform.origin.z)
 			"_scale":
 				var scales:Array = note_info.custom_data["_scale"]
 				offset.scale = Vector3(scales[0],scales[1],scales[2])
 				offset.scale = offset.scale.max(Vector3.ONE*0.001)
 			"_cutDirection":
-				rotation_degrees.z = note_info.custom_data["_cutDirection"]
+				movement_offset.rotation_degrees.z = note_info.custom_data["_cutDirection"]
 			"_fake":
 				is_fake = note_info.custom_data["_fake"]
 			"_interactable":
@@ -158,18 +173,26 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 							offset_positions_d = NoodlePoint.create_point_from_data(n_d)
 						"_localRotation":
 							var n_d = note_info.custom_data["_animation"]["_localRotation"]
-							offset_local_rotation_d = NoodlePoint.create_point_from_data(n_d)
+							offset_local_rotation_d = NoodlePoint.create_point_from_data(n_d,true)
 						"_rotation":
 							var n_d = note_info.custom_data["_animation"]["_rotation"]
-							offset_rotation_d = NoodlePoint.create_point_from_data(n_d)
+							offset_rotation_d = NoodlePoint.create_point_from_data(n_d,true)
 						"_definitePosition":
 							var n_d = note_info.custom_data["_animation"]["_definitePosition"]
 							definite_positions_d = NoodlePoint.create_point_from_data(n_d)
 						_:
 							push_warning("Unsupported parameter: ",property)
 			"_track":
+				# already handled
 				pass
 			"_color":
+				# already handled, may relocate here later TODO
+				pass
+			"_disableNoteGravity":
+				# note gravity isnt implemented TODO
+				pass
+			"_disableNoteLook":
+				# also not implemented TODO(do we even need this?..)
 				pass
 			_:
 				push_warning("Unsupported parameter: ",dat)
@@ -203,12 +226,12 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 	
 	slice_particles.reset()
 	mi.visible = true
-	move_dir = transform.basis.z
-	var start_transform:Transform3D = transform
+	move_dir = Vector3.BACK
+	var start_transform:Transform3D = movement_offset.transform
 	start_transform.origin.z = -jd/2
-	transform = start_transform
+	movement_offset.transform = start_transform
+	
 	#start_transform.rotated_local()
-	start_trans = transform
 	self.njs = njs
 	self.jd = jd
 
@@ -217,7 +240,11 @@ func set_color(color:Color) -> void:
 
 func _physics_process(delta: float) -> void:
 	super(delta)
-	#set_color(Color.WHITE * (1.0-((time / (jd/2/njs))-0.5)))
+	time = 1.0-(real_time/original_time)
+	
+	#set_color(Color.WHITE * time)
+	if !Scoreboard.paused or not is_visible_in_tree() or not Map.current_info:
+		movement_offset.transform.origin += move_dir * speed * delta
 	offset.rotation_degrees = Vector3.ZERO
 	offset.position = Vector3.ZERO
 	offset.scale = Vector3.ONE
@@ -231,20 +258,14 @@ func _physics_process(delta: float) -> void:
 		offset.global_position = start_trans.origin + InterpolationHelper.get_animation(definite_positions_d,time)*0.6
 		offset.global_position.z = InterpolationHelper.get_animation(definite_positions_d,time).z *0.6
 	if offset_local_rotation_d != null:
-		offset.rotation_degrees = InterpolationHelper.get_animation(offset_local_rotation_d,time)
+		offset.rotation = InterpolationHelper.get_animation(offset_local_rotation_d,time)
 	if offset_scale_d != null:
 		offset.scale = InterpolationHelper.get_animation(offset_scale_d,time)
 		offset.scale = offset.scale.max(Vector3.ONE*0.001)
+	global_rotation = Vector3.ZERO
 	if offset_rotation_d:
 		var new_rot:Vector3 = InterpolationHelper.get_animation(offset_rotation_d,time)
-		var new_transform:Transform3D = Transform3D.IDENTITY
-		new_transform.origin.z = -jd
-		var length:float = new_transform.origin.length()
-		var one:Vector3 = new_transform.origin.normalized().cross(start_trans.origin.normalized())
-		var angle:float = new_transform.origin.normalized().angle_to(start_trans.origin.normalized())
-		new_transform = new_transform.rotated(one,angle)
-		new_transform.origin *= ((time / (jd/njs))-0.5)/2
-		transform = new_transform
+		global_rotation = new_rot
 	
 	_mat.set_shader_parameter(&"dissolve", 1.0-dissolve)
 	_mat.set_shader_parameter(&"arrow_dissolve", 1.0-arrow_dissolve)
