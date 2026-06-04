@@ -47,7 +47,7 @@ var arrow_dissolve:float
 var start_trans:Transform3D
 var njs:float
 var jd:float
-
+var hit:bool
 
 func _ready() -> void:
 	_mat = mi.material_override as ShaderMaterial
@@ -109,6 +109,7 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 	arrow_dissolve_d = null
 	definite_positions_d = null
 	offset_rotation_d = null
+	hit = false
 	dissolve = 1.0
 	arrow_dissolve = 1.0
 	interactible = true
@@ -280,9 +281,11 @@ func set_collision_disabled(value: bool) -> void:
 	collision_small.disabled = value
 
 func cut(saber_type: int, cut_speed: Vector3, cut_plane: Plane, controller: BeepSaberController,area:Area3D) -> void:
-	if !interactible:
+	if !interactible || hit:
 		#print("NOT INTERACTIBLE")
 		return
+	
+	print("hit on , ",area)
 	# compute the angle between the cube orientation and the cut direction
 	var cut_direction_xy := -Vector3(cut_speed.x, cut_speed.y, 0.0).normalized()
 	var base_cut_angle_accuracy := global_transform.basis.y.dot(cut_direction_xy)
@@ -295,6 +298,7 @@ func cut(saber_type: int, cut_speed: Vector3, cut_plane: Plane, controller: Beep
 				if !is_fake:
 					Scoreboard.bad_cut(transform.origin)
 				cutted.emit(false)
+				hit = true
 			else:
 				return
 		else:
@@ -305,10 +309,12 @@ func cut(saber_type: int, cut_speed: Vector3, cut_plane: Plane, controller: Beep
 			if !is_fake:
 				Scoreboard.note_cut(transform.origin, cut_distance_accuracy, travel_distance_factor)
 			cutted.emit(true)
+			hit = true
 	else:
 		if !is_fake:
 			Scoreboard.bad_cut(transform.origin)
 		cutted.emit(false)
+		hit = true
 	
 	# reset the movement tracking volume for the next cut
 	controller.reset_movement_aabb()
