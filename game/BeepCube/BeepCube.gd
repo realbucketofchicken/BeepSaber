@@ -199,6 +199,7 @@ func spawn(note_info: ColorNoteInfo, current_beat: float, color : Color,njs:floa
 	piece_left.set_color(color)
 	piece_right.set_color(color)
 	set_color(color)
+	
 	_mat.set_shader_parameter(&"is_dot", is_dot)
 	# since cube instances get recycled, we gotta reset cubes that were chain
 	# heads in a past life
@@ -351,13 +352,13 @@ func cut(saber_type: int, cut_speed: Vector3, cut_plane: Plane, controller: Beep
 # cut the cube by creating two rigid bodies and using a CSGBox to create
 # the cut plane
 func _start_cut_pieces(cutplane: Plane) -> void:
-	piece_left.global_transform = global_transform
-	piece_right.global_transform = global_transform
+	piece_left.global_transform = movement_offset.global_transform
+	piece_right.global_transform = movement_offset.global_transform
 	
 	# calculate angle and position of the cut
 	var cut_angle_abs := Vector2(cutplane.normal.x, cutplane.normal.y).angle()
-	var cut_dist_from_center := cutplane.distance_to(global_transform.origin)
-	var cut_angle_rel := cut_angle_abs - global_rotation.z
+	var cut_dist_from_center := cutplane.distance_to(movement_offset.global_transform.origin)
+	var cut_angle_rel := cut_angle_abs - movement_offset.global_rotation.z
 	
 	_piece_death_count = 0
 	piece_left.start_cut(-cut_dist_from_center, cut_angle_rel + PI)
@@ -368,6 +369,6 @@ func _start_cut_pieces(cutplane: Plane) -> void:
 	piece_left.apply_central_impulse(-split_vector)
 	piece_right.apply_central_impulse(split_vector)
 	
-	slice_particles.global_transform.origin = global_transform.origin
+	slice_particles.global_transform.origin = movement_offset.global_transform.origin
 	slice_particles.rotation.z = cut_angle_abs+TAU*0.25
 	slice_particles.fire()
