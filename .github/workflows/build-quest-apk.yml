@@ -1,0 +1,156 @@
+name: Build OpenSlice Quest APK
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - godot-4-port
+
+permissions:
+  contents: read
+
+env:
+  GODOT_VERSION: "4.7.1"
+  OPENXR_VENDORS_VERSION: "5.1.0-stable"
+
+jobs:
+  build:
+    name: Build Quest APK
+    runs-on: ubuntu-24.04
+
+    container:
+      image: barichello/godot-ci:4.7.1
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Prepare Godot configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p \
+            "$HOME/.local/share/godot/export_templates" \
+            "$HOME/.config"
+
+          TEMPLATE_SOURCE="/root/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+
+          if [ ! -d "$TEMPLATE_SOURCE" ]; then
+            echo "Export templates were not found at: $TEMPLATE_SOURCE"
+            exit 1
+          fi
+
+          cp -a \
+            "$TEMPLATE_SOURCE" \
+            "$HOME/.local/share/godot/export_templates/"
+
+          if [ -d /root/.config/godot ]; then
+            cp -a /root/.config/godot "$HOME/.config/"
+          fi
+
+          godot --version
+
+      - name: Install OpenXR Vendors plugin
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          rm -rf /tmp/openxr-vendors
+          mkdir -p /tmp/openxr-vendors
+
+          wget -q \
+            "https://github.com/GodotVR/godot_openxr_vendors/releases/download/${OPENXR_VENDORS_VERSION}/godotopenxrvendorsaddon.zip" \
+            -O /tmp/openxr-vendors.zip
+
+          unzip -q \
+            /tmp/openxr-vendors.zip \
+            -d /tmp/openxr-vendors
+
+          PLUGIN_DIR="$(
+            find /tmp/openxr-vendors \
+              -type d \
+              -path "*/addons/godotopenxrvendors" \
+              -print \
+              -quit
+          )"
+
+          if [ -z "$PLUGIN_DIR" ]; then
+            echo "Could not locate addons/godotopenxrvendors in the downloaded archive."
+            exit 1
+          fi
+
+          mkdir -p "$GITHUB_WORKSPACE/addons"
+          cp -a "$PLUGIN_DIR" "$GITHUB_WORKSPACE/addons/"
+
+          echo "Installed plug-in at:"
+          find "$GITHUB_WORKSPACE/addons/godotopenxrvendors" \
+            -maxdepth 2 \
+            -type f \
+            | head -20
+
+      - name: Create debug signing key
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p "$HOME/.android"
+
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool \
+              -genkeypair \
+              -noprompt \
+              -keystore "$HOME/.android/debug.keystore" \
+              -storepass android \
+              -alias androiddebugkey \
+              -keypass android \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
+      - name: Import Godot project
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          godot \
+            --headless \
+            --verbose \
+            --path "$GITHUB_WORKSPACE" \
+            --editor \
+            --quit
+
+      - name: Export Quest APK
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p "$GITHUB_WORKSPACE/build"
+
+          export GODOT_ANDROID_KEYSTORE_DEBUG_PATH="$HOME/.android/debug.keystore"
+          export GODOT_ANDROID_KEYSTORE_DEBUG_USER="androiddebugkey"
+          export GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD="android"
+
+          godot \
+            --headless \
+            --verbose \
+            --path "$GITHUB_WORKSPACE" \
+            --install-android-build-template \
+            --export-debug \
+            "Meta Quest" \
+            "$GITHUB_WORKSPACE/build/OpenSlice-Quest.apk"
+
+          test -f "$GITHUB_WORKSPACE/build/OpenSlice-Quest.apk"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenSlice-Quest-APK
+          path: build/OpenSlice-Quest.apk
+          if-no-files-found: error
+          retention-days: 14
