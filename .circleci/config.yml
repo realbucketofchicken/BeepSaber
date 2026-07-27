@@ -1,0 +1,110 @@
+version: 2.1
+
+jobs:
+  build-quest-apk:
+    docker:
+      - image: barichello/godot-ci:4.7.1
+
+    resource_class: medium
+
+    environment:
+      OPENXR_VENDORS_VERSION: "5.1.0-stable"
+
+    steps:
+      - checkout
+
+      - run:
+          name: Show Godot version
+          command: |
+            godot --version
+
+      - run:
+          name: Install OpenXR Vendors plugin
+          command: |
+            set -euo pipefail
+
+            rm -rf \
+              /tmp/godotopenxrvendorsaddon \
+              /tmp/godotopenxrvendorsaddon.zip
+
+            wget \
+              "https://github.com/GodotVR/godot_openxr_vendors/releases/download/${OPENXR_VENDORS_VERSION}/godotopenxrvendorsaddon.zip" \
+              -O /tmp/godotopenxrvendorsaddon.zip
+
+            unzip -q \
+              /tmp/godotopenxrvendorsaddon.zip \
+              -d /tmp/godotopenxrvendorsaddon
+
+            mkdir -p addons
+            rm -rf addons/godotopenxrvendors
+
+            mv \
+              /tmp/godotopenxrvendorsaddon/asset/addons/godotopenxrvendors \
+              addons/godotopenxrvendors
+
+            test -d addons/godotopenxrvendors
+
+      - run:
+          name: Create Android debug keystore
+          command: |
+            set -euo pipefail
+
+            mkdir -p "$HOME/.android"
+
+            if [ ! -f "$HOME/.android/debug.keystore" ]; then
+              keytool \
+                -genkeypair \
+                -noprompt \
+                -keystore "$HOME/.android/debug.keystore" \
+                -storepass android \
+                -alias androiddebugkey \
+                -keypass android \
+                -keyalg RSA \
+                -keysize 2048 \
+                -validity 10000 \
+                -dname "CN=Android Debug,O=Android,C=US"
+            fi
+
+      - run:
+          name: Import Godot project
+          command: |
+            godot \
+              --headless \
+              --verbose \
+              --path "$PWD" \
+              --editor \
+              --quit
+
+      - run:
+          name: Build Quest APK
+          no_output_timeout: 30m
+          command: |
+            set -euo pipefail
+
+            mkdir -p build
+
+            export GODOT_ANDROID_KEYSTORE_DEBUG_PATH="$HOME/.android/debug.keystore"
+            export GODOT_ANDROID_KEYSTORE_DEBUG_USER="androiddebugkey"
+            export GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD="android"
+
+            godot \
+              --headless \
+              --verbose \
+              --path "$PWD" \
+              --install-android-build-template \
+              --export-debug \
+              "Meta Quest" \
+              "$PWD/build/OpenSlice-Quest.apk"
+
+            test -f "$PWD/build/OpenSlice-Quest.apk"
+
+            ls -lh "$PWD/build/OpenSlice-Quest.apk"
+
+      - store_artifacts:
+          path: build/OpenSlice-Quest.apk
+          destination: OpenSlice-Quest.apk
+
+workflows:
+  build-openslice:
+    jobs:
+      - build-quest-apk
