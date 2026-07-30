@@ -14,9 +14,9 @@ and another 5 points for **controller movement** since the last note(**subject t
 
 This system was chosen to make 100%ing a map realistic
 
-(gif showing off the map [Centipede by NiceToMeetYou](https://beatsaver.com/maps/4e8d))
+(gif showing off the map [Centipede by NiceToMeetYou](https://beatsaver.com/maps/4e8d), demonstrating mapping extensions)
 ![Centipede](doc/images/Centipede.gif)
-(gif showing off the map [Boy's a liar Pt. 2 by August](https://beatsaver.com/maps/30a1f))
+(gif showing off the map [Boy's a liar Pt. 2 by August](https://beatsaver.com/maps/30a1f), demonstrating mapping extensions)
 ![Poodels](doc/images/Poodles.gif)
 
 # About the implementation
@@ -31,7 +31,7 @@ You can play custom songs by downloading them in the in-game menu.
 ## Current Progress:
 - **Mapping Extentions**: fully working
 - **Chroma**: working partially(chroma enhancements cant be added)
-- **Noodle Extentions**: highly unfinished
+- **Noodle Extentions**: highly unfinished, but playable on older modcharts
 - **Vivify**: remains a dream... (although this exists https://github.com/V-Sekai/unidot_importer, so partial support may be possible)
 
 # Credits
